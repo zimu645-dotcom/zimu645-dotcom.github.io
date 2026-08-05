@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>zimu645-dotcom · 全栈开发者 / 独立黑客</title>
+<meta name="description" content="zimu645-dotcom 的个人主页 — 全栈开发者、独立黑客。">
+<style>
+  :root {
+    --bg: #0a0e17;
+    --bg-soft: #111827;
+    --card: rgba(17, 24, 39, 0.7);
+    --border: rgba(148, 163, 184, 0.15);
+    --text: #e5e7eb;
+    --text-dim: #94a3b8;
+    --accent: #22d3ee;
+    --accent-2: #a78bfa;
+    --green: #34d399;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                 "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+  /* 背景网格 + 光晕 */
+  .bg-grid {
+    position: fixed; inset: 0; z-index: -2;
+    background-image:
+      linear-gradient(rgba(148,163,184,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(148,163,184,0.05) 1px, transparent 1px);
+    background-size: 42px 42px;
+  }
+  .bg-glow {
+    position: fixed; z-index: -1; border-radius: 50%; filter: blur(120px);
+    opacity: 0.22; pointer-events: none;
+  }
+  .glow-1 { width: 480px; height: 480px; top: -160px; left: -120px; background: var(--accent); }
+  .glow-2 { width: 420px; height: 420px; bottom: -140px; right: -100px; background: var(--accent-2); }
+
+  .wrap { max-width: 860px; margin: 0 auto; padding: 0 24px; }
+
+  /* 顶部导航 */
+  nav {
+    position: sticky; top: 0; z-index: 10;
+    backdrop-filter: blur(12px);
+    background: rgba(10, 14, 23, 0.75);
+    border-bottom: 1px solid var(--border);
+  }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+  .logo { font-weight: 700; letter-spacing: 0.5px; }
+  .logo span { color: var(--accent); }
+  nav a { color: var(--text-dim); text-decoration: none; font-size: 14px; margin-left: 22px; transition: color .2s; }
+  nav a:hover { color: var(--accent); }
+
+  /* Hero */
+  .hero { padding: 110px 0 70px; text-align: center; }
+  .avatar {
+    width: 92px; height: 92px; border-radius: 24px; margin: 0 auto 26px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 40px; box-shadow: 0 8px 40px rgba(34, 211, 238, 0.25);
+  }
+  .hero h1 { font-size: 44px; font-weight: 800; letter-spacing: 1px; }
+  .hero h1 .dot { color: var(--accent); }
+  .hero .title {
+    margin-top: 12px; font-size: 19px; color: var(--text-dim);
+    display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;
+  }
+  .hero .title .badge {
+    padding: 4px 14px; border-radius: 999px; font-size: 13px;
+    border: 1px solid var(--border); background: var(--card); color: var(--text);
+  }
+  .hero .badge.hl { border-color: rgba(34,211,238,.4); color: var(--accent); }
+  .hero p.desc { max-width: 560px; margin: 26px auto 0; color: var(--text-dim); font-size: 16px; }
+  .typing { color: var(--accent); font-weight: 600; min-height: 1.6em; }
+
+  /* 按钮 */
+  .btns { margin-top: 36px; display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 11px 26px; border-radius: 12px; font-size: 15px; font-weight: 600;
+    text-decoration: none; transition: transform .15s, box-shadow .2s;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), #0891b2);
+    color: #062a33;
+  }
+  .btn-ghost { border: 1px solid var(--border); color: var(--text); background: var(--card); }
+  .btn:hover { transform: translateY(-2px); }
+  .btn-primary:hover { box-shadow: 0 8px 28px rgba(34, 211, 238, 0.35); }
+  .btn-ghost:hover { box-shadow: 0 8px 28px rgba(148, 163, 184, 0.12); }
+
+  /* 区块 */
+  section { padding: 64px 0; }
+  .sec-title {
+    font-size: 15px; font-weight: 700; letter-spacing: 3px;
+    color: var(--accent); text-transform: uppercase; margin-bottom: 30px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .sec-title::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+  /* 技能 */
+  .skills { display: flex; flex-wrap: wrap; gap: 10px; }
+  .skill {
+    padding: 8px 18px; border-radius: 10px; font-size: 14px;
+    background: var(--card); border: 1px solid var(--border);
+    transition: border-color .2s, transform .15s; cursor: default;
+  }
+  .skill:hover { border-color: var(--accent); transform: translateY(-2px); }
+
+  /* 项目 */
+  .projects { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 18px; }
+  .card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+    padding: 24px; transition: border-color .2s, transform .2s;
+  }
+  .card:hover { border-color: rgba(34,211,238,.45); transform: translateY(-3px); }
+  .card h3 { font-size: 17px; display: flex; align-items: center; gap: 8px; }
+  .card h3 .git { color: var(--text-dim); font-size: 13px; font-weight: 400; }
+  .card p { color: var(--text-dim); font-size: 14px; margin-top: 10px; }
+  .card .tags { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .card .tags span { font-size: 12px; padding: 3px 10px; border-radius: 999px; background: rgba(34,211,238,.1); color: var(--accent); border: 1px solid rgba(34,211,238,.2); }
+  .card a.go { display: inline-block; margin-top: 16px; color: var(--accent); font-size: 14px; text-decoration: none; font-weight: 600; }
+  .card a.go:hover { text-decoration: underline; }
+  .empty-tip { color: var(--text-dim); font-size: 14px; }
+
+  /* 联系方式 */
+  .contact-links { display: flex; gap: 16px; flex-wrap: wrap; }
+  .contact-links a {
+    flex: 1; min-width: 200px; display: flex; align-items: center; gap: 12px;
+    padding: 18px 22px; border-radius: 14px; text-decoration: none;
+    background: var(--card); border: 1px solid var(--border);
+    color: var(--text); transition: border-color .2s, transform .15s;
+  }
+  .contact-links a:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .contact-links .ico { font-size: 22px; }
+  .contact-links .lbl { font-size: 13px; color: var(--text-dim); }
+  .contact-links .val { font-size: 15px; font-weight: 600; }
+
+  footer { padding: 40px 0 50px; text-align: center; color: var(--text-dim); font-size: 13px; border-top: 1px solid var(--border); margin-top: 30px; }
+  footer a { color: var(--accent); text-decoration: none; }
+
+  @media (max-width: 640px) {
+    .hero { padding: 80px 0 50px; }
+    .hero h1 { font-size: 32px; }
+    .projects { grid-template-columns: 1fr; }
+    nav .links { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-glow glow-1"></div>
+<div class="bg-glow glow-2"></div>
+
+<nav>
+  <div class="wrap">
+    <div class="logo">zimu645<span>.</span>github.io</div>
+    <div class="links">
+      <a href="#about">关于</a>
+      <a href="#skills">技能</a>
+      <a href="#projects">项目</a>
+      <a href="#contact">联系</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero wrap">
+  <div class="avatar">🦊</div>
+  <h1>zimu645<span class="dot">.</span>dotcom</h1>
+  <div class="title">
+    <span class="badge hl">全栈开发者</span>
+    <span class="badge">独立黑客</span>
+    <span class="badge">自动化玩家</span>
+  </div>
+  <p class="desc">
+    写代码，造工具，把重复的事交给机器。<br>
+    兴趣领域：Python · 自动化 · AI 应用 · 数据采集
+  </p>
+  <div class="btns">
+    <a class="btn btn-primary" href="https://github.com/zimu645-dotcom" target="_blank" rel="noopener">GitHub ↗</a>
+    <a class="btn btn-ghost" href="#projects">看看项目 ↓</a>
+  </div>
+</header>
+
+<section id="about" class="wrap">
+  <div class="sec-title">About · 关于</div>
+  <p style="color:var(--text-dim); font-size:16px;">
+    你好，我是 <b style="color:var(--text)">zimu645-dotcom</b> —— 一名全栈开发者和独立黑客。
+    喜欢把想法变成能跑的东西，擅长用自动化解决重复劳动，对 AI 应用落地有持续热情。
+    这个页面托管在 GitHub Pages 上，是我的数字名片，也是折腾各种东西的起点。
+  </p>
+</section>
+
+<section id="skills" class="wrap">
+  <div class="sec-title">Skills · 技能</div>
+  <div class="skills">
+    <span class="skill">Python</span>
+    <span class="skill">全栈开发</span>
+    <span class="skill">Web 应用</span>
+    <span class="skill">浏览器自动化</span>
+    <span class="skill">数据采集</span>
+    <span class="skill">LLM API</span>
+    <span class="skill">语音识别</span>
+    <span class="skill">Git / GitHub</span>
+    <span class="skill">Linux</span>
+    <span class="skill">Docker</span>
+  </div>
+</section>
+
+<section id="projects" class="wrap">
+  <div class="sec-title">Projects · 项目</div>
+  <div class="projects">
+    <div class="card">
+      <h3>📚 zhihuishuzhongshu <span class="git">公开</span></h3>
+      <p>我的公开仓库项目，持续更新中。</p>
+      <div class="tags"><span>GitHub</span><span>Open Source</span></div>
+      <a class="go" href="https://github.com/zimu645-dotcom/zhihuishuzhongshu" target="_blank" rel="noopener">查看仓库 →</a>
+    </div>
+    <div class="card">
+      <h3>🔒 更多项目</h3>
+      <p>还有一些在路上的东西，暂未公开。保持关注，说不定哪天就开源了。</p>
+      <div class="tags"><span>WIP</span><span>Private</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="contact" class="wrap">
+  <div class="sec-title">Contact · 联系</div>
+  <div class="contact-links">
+    <a href="https://github.com/zimu645-dotcom" target="_blank" rel="noopener">
+      <span class="ico">🐙</span>
+      <span><span class="lbl">GitHub</span><br><span class="val">@zimu645-dotcom</span></span>
+    </a>
+    <a href="mailto:zimu645-dotcom@users.noreply.github.com">
+      <span class="ico">✉️</span>
+      <span><span class="lbl">Email</span><br><span class="val">Gmail / GitHub</span></span>
+    </a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    © 2026 <a href="https://github.com/zimu645-dotcom" target="_blank" rel="noopener">zimu645-dotcom</a> ·
+    免费托管于 <a href="https://pages.github.com" target="_blank" rel="noopener">GitHub Pages</a> ·
+    用 ❤️ 和 ☕ 构建
+  </div>
+</footer>
+
+<script>
+  // 打字机效果
+  const phrases = ["全栈开发者", "独立黑客", "自动化玩家", "AI 应用探索者"];
+  const el = document.querySelector(".typing");
+  if (!el) {
+    const desc = document.querySelector(".hero p.desc");
+    if (desc) {
+      const typing = document.createElement("div");
+      typing.className = "typing";
+      desc.parentNode.insertBefore(typing, desc.nextSibling);
+    }
+  }
+  let pi = 0, ci = 0, deleting = false;
+  function type() {
+    const t = document.querySelector(".typing");
+    if (!t) return;
+    const word = phrases[pi];
+    if (!deleting) {
+      t.textContent = word.slice(0, ++ci);
+      if (ci === word.length) { deleting = true; setTimeout(type, 1600); return; }
+      setTimeout(type, 110);
+    } else {
+      t.textContent = word.slice(0, --ci);
+      if (ci === 0) { deleting = false; pi = (pi + 1) % phrases.length; }
+      setTimeout(type, 55);
+    }
+  }
+  setTimeout(type, 600);
+</script>
+</body>
+</html>
