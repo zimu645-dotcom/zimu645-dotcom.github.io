@@ -952,7 +952,7 @@
                 textStyle: { color: 'rgba(200,215,240,0.75)', fontSize: 12 },
                 itemWidth: 14, itemHeight: 8
             },
-            grid: { left: 140, right: 70, top: 44, bottom: 20 },
+            grid: { left: 152, right: 118, top: 44, bottom: 20 },
             xAxis: {
                 type: 'value', name: '%',
                 nameTextStyle: { color: 'rgba(255,255,255,0.3)', fontSize: 11 },
@@ -961,18 +961,18 @@
                 axisLine: { show: false }
             },
             yAxis: {
-                type: 'category', data: compareNames,
+                type: 'category', data: compareNames, barCategoryGap: '45%',
                 axisLabel: { color: 'rgba(200,215,240,0.7)', fontSize: 12 },
                 axisLine: { show: false }, axisTick: { show: false }
             },
             series: [
                 {
-                    name: '优化前', type: 'bar', data: COMPARE_DATA.map(d => d.before), barWidth: 12,
+                    name: '优化前', type: 'bar', data: COMPARE_DATA.map(d => d.before), barWidth: 12, barGap: '70%',
                     itemStyle: { color: 'rgba(160,190,235,0.32)', borderRadius: [0, 3, 3, 0] },
                     label: { show: true, position: 'right', color: 'rgba(160,190,235,0.5)', fontSize: 10, formatter: '{c}%' }
                 },
                 {
-                    name: '实时优化', type: 'bar', data: COMPARE_DATA.map(d => d.current), barWidth: 12,
+                    name: '实时优化', type: 'bar', data: COMPARE_DATA.map(d => d.current), barWidth: 12, barGap: '70%',
                     itemStyle: {
                         borderRadius: [0, 3, 3, 0],
                         color: new echarts.graphic.LinearGradient(0, 0, 1, 0,
@@ -981,7 +981,7 @@
                     label: { show: true, position: 'right', color: '#00d4ff', fontSize: 11, formatter: '{c}%' }
                 },
                 {
-                    name: '行业平均', type: 'bar', data: COMPARE_DATA.map(d => d.ref), barWidth: 12,
+                    name: '行业平均', type: 'bar', data: COMPARE_DATA.map(d => d.ref), barWidth: 12, barGap: '70%',
                     itemStyle: { color: 'rgba(240,192,64,0.82)', borderRadius: [0, 3, 3, 0] },
                     label: { show: true, position: 'right', color: '#f0c040', fontSize: 10, formatter: '{c}%' }
                 }
