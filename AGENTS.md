@@ -24,9 +24,9 @@
 |------|------|------|
 | `index.html` | 门户首页 | 个人介绍 + 6 张数据大屏入口卡片（门面，最常改） |
 | `last-month.html` | 电商短板指标对比 | ECharts 柱状图：当前值 vs 行业参考值 |
-| `national-day.html` | 国庆营销实时大屏 | 实时成交动态、KPI卡片、排名、明细表格（LIVE） |
+| `national-day.html` | 国庆营销实时大屏 | 顶部=优化前/实时优化/行业平均动态对比图 + 实时成交、KPI、排名、明细（LIVE） |
 | `pareto.html` | 帕累托模型 | 年龄群体消费贡献占比 柱状+折线+80%参考线 |
-| `project-results.html` | 项目成果总览 | 转化率对比、直播成效、成果亮点 |
+| `project-results.html` | 项目成果总览 | 转化率对比分析(优化前/实时优化/行业平均动态图) + 直播成效、成果亮点 |
 | `malaysia-live.html` | 马来西亚 TikTok 直播 | 实时在线、商品点击率趋势、流量结构（LIVE） |
 | `rfm.html` | RFM 八象限三维模型 | 满屏 SVG 三维立方体，无 ECharts |
 
@@ -114,7 +114,7 @@ git config --global --unset http.proxy 2>/dev/null
 git config --global --unset https.proxy 2>/dev/null
 
 # 2. 进入工作区
-cd C:/Users/Administrator/Desktop/zimu645-dotcom.github.io
+cd "D:/html各可视化大屏/zimu645-dotcom.github.io"   # 本地工作区(含中文路径,必须加引号)
 
 # 3. 改文件（HTML/CSS/JS）
 # 改完【必须先本地验证】
@@ -168,6 +168,31 @@ gh api "repos/zimu645-dotcom/zimu645-dotcom.github.io/pages" --jq '{branch, buil
 gh api "repos/zimu645-dotcom/zimu645-dotcom.github.io/git/trees/HEAD?recursive=1" --jq '.tree[].path'  # 文件列表
 curl -s -o /dev/null -w "%{http_code}\n" https://zimu645-dotcom.github.io/   # 线上存活检测
 ```
+
+---
+
+## 11. 动态对比图表（优化前 / 实时优化 / 行业平均）模式与坑
+
+已在 **national-day.html**（国庆营销·实时优化）、**project-results.html**（项目成果·国内渠道）实现。样式：横向分组柱状图，3 个 series。
+
+**数据结构**：每指标 `{ name, before(优化前,固定), target(目标上限), ref(行业平均), current(实时值) }`，`current` 初始 = `before`。
+
+**动态逻辑**：`setInterval(refresh, 1500)`，refresh 里 `current = min(current + inc, target)`（只增不减，逐秒逼近目标）。`inc` 按量级保底：`≥10 → 0.1`；`1~10 → 0.02`；`<1 → 0.005`。
+
+**更新图表（★最关键，别踩）**：
+```js
+// ✅ 正确：更新第2个 series(实时优化)
+myChart.setOption({ series: [{}, { data: COMPARE_DATA.map(d => d.current) }] });
+// ❌ 错误：`[{data}]` 会默认合并到 series[0](优化前)，导致两系列数据颠倒！
+myChart.setOption({ series: [{ data: ... }] });
+```
+series 顺序：0=优化前(灰 `rgba(160,190,235,0.32)`)、1=实时优化(青渐变 `#00d4ff→#4a7cf7`)、2=行业平均(金 `rgba(240,192,64,0.82)`)。
+
+**⚠️ 标签重叠坑**：3 个值接近且都较小（如京东主图点击率 1.5/1.6/2.2）时，柱子贴太近→右侧数值标签重叠。解法：
+- 每个 series 加 `barGap: '70%'`，category 轴加 `barCategoryGap: '45%'`，拉开柱距
+- `grid.right` 加大（如 118），给长标签留空间
+
+**⚠️ 文件名规范事故（吃过亏）**：曾有人把 `national-day.html` 重命名为中文 `国内营销数据.html` 推上线，导致 `/national-day.html` **404**（所有导航/门户都链向英文名）。教训：**严守英文小写短名**（§2），杜绝中文文件名。若线上出现中文名文件导致 404，用 `git mv 中文名.html 英文名.html` 改回并重推。
 
 ---
 
