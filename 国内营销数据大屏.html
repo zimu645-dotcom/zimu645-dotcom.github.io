@@ -627,19 +627,33 @@
     </header>
 
     <!-- ========== 第一行 KPI（原有核心指标） ========== -->
-    <style id="compare-css">
-.compare-section{margin-bottom:14px}
-.compare-chart{height:380px;width:100%}
-@media(max-width:640px){.compare-chart{height:320px}}
+    <style id="industry-css">
+.industry-section{margin-bottom:14px}
+.industry-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.industry-item{background:rgba(8,16,36,0.55);border:1px solid rgba(74,124,247,0.10);border-radius:12px;padding:12px 14px;text-align:center;position:relative;overflow:hidden;transition:border-color .25s,transform .25s}
+.industry-item::before{content:'';position:absolute;top:0;left:0;bottom:0;width:3px;background:var(--c);box-shadow:0 0 12px var(--c)}
+.industry-item:hover{border-color:rgba(74,124,247,0.3);transform:translateY(-2px)}
+.industry-item .ind-plat{font-size:11px;color:rgba(160,190,235,0.55);letter-spacing:.5px;margin-bottom:2px}
+.industry-item .ind-metric{font-size:12px;color:rgba(200,215,240,0.75);margin-bottom:7px}
+.industry-item .ind-val{font-size:24px;font-weight:700;color:#fff;line-height:1;letter-spacing:.5px;font-variant-numeric:tabular-nums}
+.industry-item .ind-val small{font-size:12px;font-weight:400;color:rgba(160,190,235,0.45);margin-left:2px}
+@media(max-width:1200px){.industry-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:640px){.industry-grid{grid-template-columns:repeat(2,1fr)}.industry-item .ind-val{font-size:20px}}
 </style>
-<!-- ========== 优化前 vs 实时优化 vs 行业平均(动态对比) ========== -->
-<section class="compare-section">
+<!-- ========== 行业平均数据(最上方,基准参考) ========== -->
+<section class="industry-section">
     <div class="card" style="width:100%;">
-        <div class="card-title"><span class="dot"></span>📊 优化前 VS 实时优化 VS 行业平均
-            <span class="live-badge">● LIVE</span>
-            <span class="ind-note" style="margin-left:auto;font-size:10px;color:rgba(160,190,235,0.4);letter-spacing:.5px;">实时优化值逐秒追赶行业基准</span>
+        <div class="card-title"><span class="dot"></span>🎯 行业平均数据
+            <span class="ind-note">行业基准参考 · 用于对比实时优化值</span>
         </div>
-        <div id="chartCompare" class="compare-chart"></div>
+        <div class="industry-grid">
+            <div class="industry-item" style="--c:#00d4ff"><div class="ind-plat">抖音</div><div class="ind-metric">视频完播率</div><div class="ind-val">25.00<small>%</small></div></div>
+            <div class="industry-item" style="--c:#00d4ff"><div class="ind-plat">抖音</div><div class="ind-metric">转化率</div><div class="ind-val">0.50<small>%</small></div></div>
+            <div class="industry-item" style="--c:#e94e4e"><div class="ind-plat">京东</div><div class="ind-metric">主图点击率</div><div class="ind-val">2.20<small>%</small></div></div>
+            <div class="industry-item" style="--c:#e94e4e"><div class="ind-plat">京东</div><div class="ind-metric">成交转化率</div><div class="ind-val">2.50<small>%</small></div></div>
+            <div class="industry-item" style="--c:#a29bfe"><div class="ind-plat">官方商城</div><div class="ind-metric">站外进店率</div><div class="ind-val">23.00<small>%</small></div></div>
+            <div class="industry-item" style="--c:#a29bfe"><div class="ind-plat">官方商城</div><div class="ind-metric">转化率</div><div class="ind-val">2.20<small>%</small></div></div>
+        </div>
     </div>
 </section>
 
@@ -694,7 +708,6 @@
         // ================================================================
         let currentData = JSON.parse(JSON.stringify(BASE_DATA));
         let chartRankInstance = null;
-        let chartCompareInstance = null;
         let updateTimer = null;
         let logTimer = null;
         const logContainer = document.getElementById('logContainer');
@@ -899,85 +912,6 @@
             { label: '转化率', platform: '官方商城', metric: '转化率' },
         ];
 
-        function renderCompareChart(data) {
-            const dom = document.getElementById('chartCompare');
-            if (!dom) return;
-            if (!chartCompareInstance) chartCompareInstance = echarts.init(dom);
-            const rows = KPI_MAP.map(k => {
-                const item = data.find(d => d.platform === k.platform && d.metric === k.metric);
-                return {
-                    name: k.platform + '·' + k.label,
-                    before: item ? +((item.old * 100).toFixed(2)) : 0,
-                    current: item ? +((item.new * 100).toFixed(2)) : 0,
-                    ref: item ? +((item.ref * 100).toFixed(2)) : 0,
-                    beforeS: item ? (item.old * 100).toFixed(2) + '%' : '-',
-                    curS: item ? (item.new * 100).toFixed(2) + '%' : '-',
-                    refS: item ? (item.ref * 100).toFixed(2) + '%' : '-'
-                };
-            });
-            const names = rows.map(r => r.name);
-            const option = {
-                tooltip: {
-                    trigger: 'axis',
-                    axisPointer: { type: 'shadow' },
-                    formatter: function(ps) {
-                        const i = ps[0].dataIndex; const r = rows[i];
-                        const gapC = (r.current - r.before).toFixed(2);
-                        const gapRef = (r.current - r.ref).toFixed(2);
-                        return '<strong>' + r.name + '</strong><br/>' +
-                            '优化前：' + r.beforeS + '<br/>' +
-                            '实时优化：<span style="color:#00d4ff">' + r.curS + '</span> (' +
-                            (gapC >= 0 ? '+' : '') + gapC + 'pp)<br/>' +
-                            '行业平均：<span style="color:#f0c040">' + r.refS + '</span> (差' +
-                            (gapRef >= 0 ? '+' : '') + gapRef + 'pp)';
-                    }
-                },
-                legend: {
-                    data: ['优化前', '实时优化', '行业平均'], top: 0,
-                    textStyle: { color: 'rgba(200,215,240,0.75)', fontSize: 12 },
-                    itemWidth: 14, itemHeight: 8
-                },
-                grid: { left: 135, right: 90, top: 48, bottom: 20 },
-                xAxis: {
-                    type: 'value', name: '%',
-                    nameTextStyle: { color: 'rgba(160,190,235,0.35)', fontSize: 11 },
-                    axisLabel: { color: 'rgba(160,190,235,0.4)', fontSize: 11, formatter: '{value}%' },
-                    splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)', type: 'dashed' } },
-                    axisLine: { show: false }
-                },
-                yAxis: {
-                    type: 'category', data: names,
-                    axisLabel: { color: 'rgba(200,215,240,0.7)', fontSize: 12 },
-                    axisLine: { show: false }, axisTick: { show: false }
-                },
-                series: [
-                    {
-                        name: '优化前', type: 'bar', data: rows.map(r => r.before), barWidth: 12,
-                        itemStyle: { color: 'rgba(160,190,235,0.32)', borderRadius: [0, 3, 3, 0] },
-                        label: { show: true, position: 'right', color: 'rgba(160,190,235,0.5)', fontSize: 10, formatter: '{c}%' }
-                    },
-                    {
-                        name: '实时优化', type: 'bar', data: rows.map(r => r.current), barWidth: 12,
-                        itemStyle: {
-                            borderRadius: [0, 3, 3, 0],
-                            color: new echarts.graphic.LinearGradient(0, 0, 1, 0,
-                                [{ offset: 0, color: '#00d4ff' }, { offset: 1, color: '#4a7cf7' }])
-                        },
-                        label: { show: true, position: 'right', color: '#00d4ff', fontSize: 11, formatter: '{c}%' }
-                    },
-                    {
-                        name: '行业平均', type: 'bar', data: rows.map(r => r.ref), barWidth: 12,
-                        itemStyle: { color: 'rgba(240,192,64,0.82)', borderRadius: [0, 3, 3, 0] },
-                        label: { show: true, position: 'right', color: '#f0c040', fontSize: 10, formatter: '{c}%' }
-                    }
-                ],
-                animationDuration: 500,
-                animationDurationUpdate: 700,
-                backgroundColor: 'transparent'
-            };
-            chartCompareInstance.setOption(option, true);
-        }
-
         function renderKPI(data) {
             const grid = document.getElementById('kpiGrid');
             const cards = KPI_MAP.map(kpi => {
@@ -1146,7 +1080,6 @@
             document.getElementById('liveTimestamp').textContent = ts;
             renderKPI(currentData);
             renderRankChart(currentData);
-            renderCompareChart(currentData);
             renderTable(currentData);
         }
         // ================================================================
@@ -1162,7 +1095,6 @@
             logTimer = setInterval(addLogEntry, 1200);
             window.addEventListener('resize', () => {
                 if (chartRankInstance) chartRankInstance.resize();
-                if (chartCompareInstance) chartCompareInstance.resize();
             });
         }
         window.addEventListener('load', init);
