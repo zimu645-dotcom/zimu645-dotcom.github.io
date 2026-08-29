@@ -899,19 +899,33 @@
         // ============================================================
         //  3. ECharts - 转化率柱状图
         // ============================================================
-                const chartDom = document.getElementById('conversionChart');
+                        const chartDom = document.getElementById('conversionChart');
         const myChart = echarts.init(chartDom, 'dark');
 
-        // 优化前 / 优化后 / 行业平均  三指标对比数据
+        // 国内渠道 优化前(固定) / 实时优化(动态增长逼近目标) / 行业平均(基准)
         const COMPARE_DATA = [
-            { name: '京东·主图点击率', before: 1.50, after: 2.50, ref: 2.20 },
-            { name: '京东·转化率', before: 1.60, after: 2.80, ref: 2.50 },
-            { name: '抖音·视频完播率', before: 19.0, after: 28.0, ref: 25.0 },
-            { name: '抖音·转化率', before: 0.38, after: 0.70, ref: 0.50 },
-            { name: '官方商城·站外进店率', before: 16.0, after: 26.0, ref: 23.0 },
-            { name: '官方商城·转化率', before: 1.80, after: 4.50, ref: 2.20 },
+            { name: '京东·主图点击率', before: 1.50, target: 2.50, ref: 2.20, current: 1.50 },
+            { name: '京东·转化率', before: 1.60, target: 2.80, ref: 2.50, current: 1.60 },
+            { name: '抖音·视频完播率', before: 19.0, target: 28.0, ref: 25.0, current: 19.0 },
+            { name: '抖音·转化率', before: 0.38, target: 0.70, ref: 0.50, current: 0.38 },
+            { name: '官方商城·站外进店率', before: 16.0, target: 26.0, ref: 23.0, current: 16.0 },
+            { name: '官方商城·转化率', before: 1.80, target: 4.50, ref: 2.20, current: 1.80 },
         ];
         const compareNames = COMPARE_DATA.map(d => d.name);
+
+        // 实时动态：只增不减，逐秒逼近 target
+        function refreshCompare() {
+            COMPARE_DATA.forEach(d => {
+                if (d.current >= d.target * 0.995) { d.current = d.target; return; }
+                let inc = d.current * (0.005 + Math.random() * 0.015);
+                if (d.current >= 10) inc = Math.max(inc, 0.1);
+                else if (d.current >= 1) inc = Math.max(inc, 0.02);
+                else inc = Math.max(inc, 0.005);
+                d.current = Math.min(d.current + inc, d.target);
+                if (d.current >= d.target * 0.995) d.current = d.target;
+            });
+            myChart.setOption({ series: [{}, { data: COMPARE_DATA.map(d => Number(d.current.toFixed(2))) }] });
+        }
 
         const option = {
             tooltip: {
@@ -923,18 +937,18 @@
                 textStyle: { color: '#e8edf5', fontSize: 13 },
                 formatter: function(ps) {
                     const i = ps[0].dataIndex; const d = COMPARE_DATA[i];
-                    const gapA = (d.after - d.before).toFixed(2);
-                    const gapRef = (d.after - d.ref).toFixed(2);
+                    const gapA = (d.current - d.before).toFixed(2);
+                    const gapRef = (d.current - d.ref).toFixed(2);
                     return '<strong>' + d.name + '</strong><br/>' +
                         '优化前：' + d.before + '%<br/>' +
-                        '优化后：<span style="color:#00d4ff">' + d.after + '%</span> (' +
+                        '实时优化：<span style="color:#00d4ff">' + d.current.toFixed(2) + '%</span> (' +
                         (gapA >= 0 ? '+' : '') + gapA + 'pp)<br/>' +
                         '行业平均：<span style="color:#f0c040">' + d.ref + '%</span> (差' +
                         (gapRef >= 0 ? '+' : '') + gapRef + 'pp)';
                 }
             },
             legend: {
-                data: ['优化前', '优化后', '行业平均'], top: 0,
+                data: ['优化前', '实时优化', '行业平均'], top: 0,
                 textStyle: { color: 'rgba(200,215,240,0.75)', fontSize: 12 },
                 itemWidth: 14, itemHeight: 8
             },
@@ -958,7 +972,7 @@
                     label: { show: true, position: 'right', color: 'rgba(160,190,235,0.5)', fontSize: 10, formatter: '{c}%' }
                 },
                 {
-                    name: '优化后', type: 'bar', data: COMPARE_DATA.map(d => d.after), barWidth: 12,
+                    name: '实时优化', type: 'bar', data: COMPARE_DATA.map(d => d.current), barWidth: 12,
                     itemStyle: {
                         borderRadius: [0, 3, 3, 0],
                         color: new echarts.graphic.LinearGradient(0, 0, 1, 0,
@@ -978,6 +992,8 @@
         };
 
         myChart.setOption(option);
+        refreshCompare();
+        setInterval(refreshCompare, 1500);
 
         // 响应式
         window.addEventListener('resize', () => {
