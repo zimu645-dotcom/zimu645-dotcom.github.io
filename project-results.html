@@ -899,16 +899,19 @@
         // ============================================================
         //  3. ECharts - 转化率柱状图
         // ============================================================
-        const chartDom = document.getElementById('conversionChart');
+                const chartDom = document.getElementById('conversionChart');
         const myChart = echarts.init(chartDom, 'dark');
 
-        // 数据
-        const categories = ['视频转化', '独立站', '京东'];
-        const values = [0.7, 4.5, 2.8];
-        const colors = ['#4f8cf7', '#4fc7a8', '#7c5cfc'];
-
-        // 判断是否高于行业平均 (独立站 4.5% 高于行业平均)
-        const isAboveAvg = [false, true, false];
+        // 优化前 / 优化后 / 行业平均  三指标对比数据
+        const COMPARE_DATA = [
+            { name: '京东·主图点击率', before: 1.50, after: 2.50, ref: 2.20 },
+            { name: '京东·转化率', before: 1.60, after: 2.80, ref: 2.50 },
+            { name: '抖音·视频完播率', before: 19.0, after: 28.0, ref: 25.0 },
+            { name: '抖音·转化率', before: 0.38, after: 0.70, ref: 0.50 },
+            { name: '官方商城·站外进店率', before: 16.0, after: 26.0, ref: 23.0 },
+            { name: '官方商城·转化率', before: 1.80, after: 4.50, ref: 2.20 },
+        ];
+        const compareNames = COMPARE_DATA.map(d => d.name);
 
         const option = {
             tooltip: {
@@ -918,125 +921,60 @@
                 borderColor: 'rgba(79,140,247,0.2)',
                 borderWidth: 1,
                 textStyle: { color: '#e8edf5', fontSize: 13 },
-                formatter: function(params) {
-                    const p = params[0];
-                    let extra = '';
-                    if (p.name === '独立站') {
-                        extra = '<br/><span style="color:#4fc7a8;">★ 高于行业平均水平</span>';
-                    }
-                    return `<strong>${p.name}</strong><br/>转化率：<strong>${p.value}%</strong>${extra}`;
+                formatter: function(ps) {
+                    const i = ps[0].dataIndex; const d = COMPARE_DATA[i];
+                    const gapA = (d.after - d.before).toFixed(2);
+                    const gapRef = (d.after - d.ref).toFixed(2);
+                    return '<strong>' + d.name + '</strong><br/>' +
+                        '优化前：' + d.before + '%<br/>' +
+                        '优化后：<span style="color:#00d4ff">' + d.after + '%</span> (' +
+                        (gapA >= 0 ? '+' : '') + gapA + 'pp)<br/>' +
+                        '行业平均：<span style="color:#f0c040">' + d.ref + '%</span> (差' +
+                        (gapRef >= 0 ? '+' : '') + gapRef + 'pp)';
                 }
             },
-            grid: {
-                left: '8%',
-                right: '8%',
-                bottom: '16%',
-                top: '8%',
-                containLabel: false
+            legend: {
+                data: ['优化前', '优化后', '行业平均'], top: 0,
+                textStyle: { color: 'rgba(200,215,240,0.75)', fontSize: 12 },
+                itemWidth: 14, itemHeight: 8
             },
+            grid: { left: 140, right: 70, top: 44, bottom: 20 },
             xAxis: {
-                type: 'category',
-                data: categories,
-                axisLine: { show: false },
-                axisTick: { show: false },
-                axisLabel: {
-                    color: 'rgba(255,255,255,0.5)',
-                    fontSize: 12,
-                    fontWeight: 400,
-                    padding: [8, 0, 0, 0]
-                }
+                type: 'value', name: '%',
+                nameTextStyle: { color: 'rgba(255,255,255,0.3)', fontSize: 11 },
+                axisLabel: { color: 'rgba(160,190,235,0.4)', fontSize: 11, formatter: '{value}%' },
+                splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)', type: 'dashed' } },
+                axisLine: { show: false }
             },
             yAxis: {
-                type: 'value',
-                name: '转化率 %',
-                nameTextStyle: {
-                    color: 'rgba(255,255,255,0.3)',
-                    fontSize: 11,
-                    padding: [0, 40, 0, 0]
-                },
-                min: 0,
-                max: 6,
-                splitLine: {
-                    lineStyle: {
-                        color: 'rgba(255,255,255,0.04)',
-                        type: 'dashed'
-                    }
-                },
-                axisLabel: {
-                    color: 'rgba(255,255,255,0.3)',
-                    fontSize: 11
-                },
-                axisLine: { show: false },
-                axisTick: { show: false }
+                type: 'category', data: compareNames,
+                axisLabel: { color: 'rgba(200,215,240,0.7)', fontSize: 12 },
+                axisLine: { show: false }, axisTick: { show: false }
             },
-            series: [{
-                type: 'bar',
-                data: values.map((v, i) => ({
-                    value: v,
+            series: [
+                {
+                    name: '优化前', type: 'bar', data: COMPARE_DATA.map(d => d.before), barWidth: 12,
+                    itemStyle: { color: 'rgba(160,190,235,0.32)', borderRadius: [0, 3, 3, 0] },
+                    label: { show: true, position: 'right', color: 'rgba(160,190,235,0.5)', fontSize: 10, formatter: '{c}%' }
+                },
+                {
+                    name: '优化后', type: 'bar', data: COMPARE_DATA.map(d => d.after), barWidth: 12,
                     itemStyle: {
-                        color: isAboveAvg[i] ? {
-                            type: 'linear',
-                            x: 0,
-                            y: 0,
-                            x2: 0,
-                            y2: 1,
-                            colorStops: [
-                                { offset: 0, color: '#4fc7a8' },
-                                { offset: 1, color: '#2d9b80' }
-                            ]
-                        } : colors[i],
-                        borderRadius: [6, 6, 0, 0],
-                        shadowColor: isAboveAvg[i] ? 'rgba(79,199,168,0.25)' : 'rgba(79,140,247,0.12)',
-                        shadowBlur: 12,
-                        shadowOffsetY: 4
-                    }
-                })),
-                barWidth: '42%',
-                label: {
-                    show: true,
-                    position: 'top',
-                    formatter: function(params) {
-                        let label = params.value + '%';
-                        if (params.dataIndex === 1) {
-                            label += ' ★';
-                        }
-                        return label;
+                        borderRadius: [0, 3, 3, 0],
+                        color: new echarts.graphic.LinearGradient(0, 0, 1, 0,
+                            [{ offset: 0, color: '#00d4ff' }, { offset: 1, color: '#4a7cf7' }])
                     },
-                    color: 'rgba(255,255,255,0.7)',
-                    fontSize: 13,
-                    fontWeight: 600,
-                    fontFamily: 'Segoe UI, sans-serif'
+                    label: { show: true, position: 'right', color: '#00d4ff', fontSize: 11, formatter: '{c}%' }
                 },
-                itemStyle: {
-                    borderRadius: [6, 6, 0, 0]
-                },
-                // 增加背景阴影
-                backgroundStyle: {
-                    color: 'rgba(255,255,255,0.02)',
-                    borderRadius: [6, 6, 0, 0]
-                },
-                showBackground: false,
-                animationDelay: function(idx) {
-                    return idx * 150;
+                {
+                    name: '行业平均', type: 'bar', data: COMPARE_DATA.map(d => d.ref), barWidth: 12,
+                    itemStyle: { color: 'rgba(240,192,64,0.82)', borderRadius: [0, 3, 3, 0] },
+                    label: { show: true, position: 'right', color: '#f0c040', fontSize: 10, formatter: '{c}%' }
                 }
-            }],
-            // 在独立站柱子上加一个标记
-            graphic: [{
-                type: 'text',
-                left: '52%',
-                top: '18%',
-                style: {
-                    text: '⭐',
-                    fontSize: 18,
-                    textAlign: 'center',
-                    textVerticalAlign: 'middle',
-                    fill: '#f7a84f',
-                    shadowBlur: 10,
-                    shadowColor: 'rgba(247,168,79,0.3)'
-                },
-                // 动态定位会在渲染后调整，但这里作为装饰，用z控制
-                z: 100
-            }]
+            ],
+            animationDuration: 500,
+            animationDurationUpdate: 700,
+            backgroundColor: 'transparent'
         };
 
         myChart.setOption(option);
