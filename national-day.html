@@ -627,7 +627,37 @@
     </header>
 
     <!-- ========== 第一行 KPI（原有核心指标） ========== -->
-    <section class="kpi-grid" id="kpiGrid"></section>
+    <style id="industry-css">
+.industry-section{margin-bottom:14px}
+.industry-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.industry-item{background:rgba(8,16,36,0.55);border:1px solid rgba(74,124,247,0.10);border-radius:12px;padding:12px 14px;text-align:center;position:relative;overflow:hidden;transition:border-color .25s,transform .25s}
+.industry-item::before{content:'';position:absolute;top:0;left:0;bottom:0;width:3px;background:var(--c);box-shadow:0 0 12px var(--c)}
+.industry-item:hover{border-color:rgba(74,124,247,0.3);transform:translateY(-2px)}
+.industry-item .ind-plat{font-size:11px;color:rgba(160,190,235,0.55);letter-spacing:.5px;margin-bottom:2px}
+.industry-item .ind-metric{font-size:12px;color:rgba(200,215,240,0.75);margin-bottom:7px}
+.industry-item .ind-val{font-size:24px;font-weight:700;color:#fff;line-height:1;letter-spacing:.5px;font-variant-numeric:tabular-nums}
+.industry-item .ind-val small{font-size:12px;font-weight:400;color:rgba(160,190,235,0.45);margin-left:2px}
+@media(max-width:1200px){.industry-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:640px){.industry-grid{grid-template-columns:repeat(2,1fr)}.industry-item .ind-val{font-size:20px}}
+</style>
+<!-- ========== 行业平均数据(最上方,基准参考) ========== -->
+<section class="industry-section">
+    <div class="card" style="width:100%;">
+        <div class="card-title"><span class="dot"></span>🎯 行业平均数据
+            <span class="ind-note">行业基准参考 · 用于对比实时优化值</span>
+        </div>
+        <div class="industry-grid">
+            <div class="industry-item" style="--c:#00d4ff"><div class="ind-plat">抖音</div><div class="ind-metric">视频完播率</div><div class="ind-val">25.00<small>%</small></div></div>
+            <div class="industry-item" style="--c:#00d4ff"><div class="ind-plat">抖音</div><div class="ind-metric">转化率</div><div class="ind-val">0.50<small>%</small></div></div>
+            <div class="industry-item" style="--c:#e94e4e"><div class="ind-plat">京东</div><div class="ind-metric">主图点击率</div><div class="ind-val">2.20<small>%</small></div></div>
+            <div class="industry-item" style="--c:#e94e4e"><div class="ind-plat">京东</div><div class="ind-metric">成交转化率</div><div class="ind-val">2.50<small>%</small></div></div>
+            <div class="industry-item" style="--c:#a29bfe"><div class="ind-plat">官方商城</div><div class="ind-metric">站外进店率</div><div class="ind-val">23.00<small>%</small></div></div>
+            <div class="industry-item" style="--c:#a29bfe"><div class="ind-plat">官方商城</div><div class="ind-metric">转化率</div><div class="ind-val">2.20<small>%</small></div></div>
+        </div>
+    </div>
+</section>
+
+<section class="kpi-grid" id="kpiGrid"></section>
 
     <!-- ========== 实时成交日志 ========== -->
     <section class="log-section">
