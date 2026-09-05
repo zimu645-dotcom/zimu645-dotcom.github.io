@@ -1,0 +1,894 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TikTok Shop LIVE 直播中控台（演练演示）</title>
+<style>
+  :root{
+    --bg:#0b0b0f; --card:#15151c; --card2:#1b1b25; --line:#262633;
+    --tx:#f2f3f5; --tx2:#9aa0ad; --tx3:#5c6270;
+    --cy:#25f4ee; --pk:#fe2c55; --pu:#a970ff; --ok:#2fe66f; --bad:#ff4d5e; --warn:#ffb020;
+    --mono:"Bahnschrift","Segoe UI",system-ui,-apple-system,"Microsoft YaHei",sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--tx);font:13px/1.45 var(--mono);overflow:hidden}
+  .num{font-variant-numeric:tabular-nums}
+  /* ---------- header ---------- */
+  header{height:58px;display:flex;align-items:center;gap:14px;padding:0 14px;
+    background:linear-gradient(180deg,#12121a,#101016);border-bottom:1px solid var(--line)}
+  .logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;white-space:nowrap}
+  .logo .dot{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;font-size:13px;
+    background:linear-gradient(135deg,#25f4ee,#fe2c55)}
+  .logo small{display:block;font-weight:400;color:var(--tx3);font-size:10px;letter-spacing:.4px}
+  .chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--card);
+    border-radius:20px;padding:4px 10px;font-size:12px;color:var(--tx2);white-space:nowrap}
+  .chip b{color:var(--tx)}
+  .chip.drill{border-color:#5e1a26;background:#1f0d13;color:#ff8fa0}
+  .chip.drill::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--pk);box-shadow:0 0 8px var(--pk)}
+  .chip.ok::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok)}
+  .spacer{flex:1}
+  .stage-pill{display:flex;align-items:center;gap:8px;background:var(--card2);border:1px solid var(--line);
+    border-radius:8px;padding:5px 12px;font-size:12.5px}
+  .stage-pill i{width:8px;height:8px;border-radius:50%;background:var(--tx3)}
+  .stage-pill i.live{background:var(--ok);box-shadow:0 0 8px var(--ok);animation:pulse 1.6s infinite}
+  @keyframes pulse{50%{opacity:.35}}
+  .clock{font-size:12px;color:var(--tx2);text-align:right;white-space:nowrap}
+  .clock b{color:var(--tx);font-size:15px}
+  .btns{display:flex;gap:6px;align-items:center}
+  button{cursor:pointer;border:1px solid var(--line);background:var(--card2);color:var(--tx);
+    border-radius:7px;padding:6px 11px;font-size:12.5px;font-family:var(--mono)}
+  button:hover{border-color:var(--cy);color:var(--cy)}
+  button.primary{background:linear-gradient(135deg,#1f9d97,#b02a55);border-color:transparent;color:#fff}
+  select{background:var(--card2);color:var(--tx);border:1px solid var(--line);border-radius:7px;padding:5px 6px;font-size:12.5px}
+  .cb{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--tx2);white-space:nowrap}
+  /* ---------- KPI strip ---------- */
+  .kpis{display:grid;grid-template-columns:repeat(12,1fr);gap:8px;padding:10px 12px 0}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:7px 10px 6px;position:relative;overflow:hidden}
+  .kpi .l{font-size:11px;color:var(--tx3);display:flex;justify-content:space-between;align-items:center}
+  .kpi .v{font-size:21px;font-weight:650;margin-top:1px;letter-spacing:.2px}
+  .kpi .s{font-size:10.5px;color:var(--tx3);margin-top:1px;white-space:nowrap}
+  .kpi.hot{border-color:#5e1a26;background:linear-gradient(135deg,#171016,#1c1016)}
+  .kpi.hot .v{color:#ff8fa0}
+  .kpi .u{font-size:11px;color:var(--tx2);font-weight:400;margin-left:2px}
+  /* ---------- main grid ---------- */
+  .wrap{display:grid;grid-template-columns:minmax(330px,400px) minmax(520px,1fr) minmax(320px,400px);
+    gap:10px;padding:10px 12px;height:calc(100vh - 148px)}
+  .col{display:flex;flex-direction:column;gap:10px;min-height:0}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:10px 12px;min-height:0;
+    display:flex;flex-direction:column}
+  .panel h3{font-size:12px;color:var(--tx2);display:flex;align-items:center;gap:7px;margin-bottom:8px;letter-spacing:.3px}
+  .panel h3::before{content:"";width:3px;height:12px;border-radius:2px;background:var(--cy)}
+  .panel h3 .r{flex:1;text-align:right;font-weight:400;color:var(--tx3);font-size:11px}
+  .grow{flex:1;min-height:0}
+  /* product monitor */
+  .prod{display:flex;gap:10px}
+  .thumb{width:92px;height:92px;border-radius:10px;flex:none;position:relative;overflow:hidden;
+    background:radial-gradient(circle at 30% 25%,#2c2438,#121018)}
+  .thumb .img{width:100%;height:100%;display:grid;place-items:center;font-size:38px}
+  .thumb .no{position:absolute;left:6px;top:6px;background:rgba(0,0,0,.6);border:1px solid var(--line);
+    border-radius:6px;padding:0 6px;font-size:11px;color:var(--cy)}
+  .pinfo{flex:1;min-width:0}
+  .pinfo .nm{font-size:15.5px;font-weight:700;display:flex;gap:8px;align-items:center}
+  .pinfo .nm .tag{font-size:10px;font-weight:500;color:var(--tx);background:linear-gradient(135deg,#25f4ee33,#fe2c5533);
+    border:1px solid var(--line);border-radius:5px;padding:1px 6px}
+  .pinfo .sub{color:var(--tx2);font-size:11.5px;margin-top:2px}
+  .pinfo .row2{display:flex;gap:14px;margin-top:6px;flex-wrap:wrap}
+  .pinfo .row2 span{font-size:11.5px;color:var(--tx3)}
+  .pinfo .row2 b{color:var(--tx);font-size:13px}
+  .price{color:#ffd27d !important}
+  /* signal area */
+  .sig{display:flex;align-items:center;gap:14px;margin-top:10px;padding:8px 10px;border:1px solid var(--line);
+    border-radius:9px;background:var(--card2)}
+  .sig .cur{text-align:center;min-width:86px}
+  .sig .cur .big{font-size:34px;font-weight:750;line-height:1.05}
+  .sig .cur .cap{font-size:10.5px;color:var(--tx3)}
+  .sig .gbox{flex:1}
+  .sig .gbox .lab{display:flex;justify-content:space-between;font-size:11px;color:var(--tx3);margin-bottom:4px}
+  .gauge{position:relative;height:12px;border-radius:6px;background:#23232f;overflow:visible}
+  .gauge .fill{position:absolute;inset:0 auto 0 0;width:0%;border-radius:6px;
+    background:linear-gradient(90deg,#2fe66f,#25f4ee)}
+  .gauge .fill.bad{background:linear-gradient(90deg,#ff4d5e,#ffb020)}
+  .gauge .thr{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--warn);opacity:.85}
+  .gauge .thr::after{content:"0.70";position:absolute;top:-15px;left:-9px;font-size:9.5px;color:var(--warn)}
+  .judge{margin-top:6px;font-size:11.5px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .judge .st{font-weight:600}
+  .st.ok{color:var(--ok)} .st.watch{color:var(--warn)} .st.bad{color:var(--bad)} .st.idle{color:var(--tx3)}
+  /* window chips */
+  .wins{display:flex;gap:6px;margin-top:10px;align-items:flex-end}
+  .wchip{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+  .wchip .wv{font-size:10.5px;color:var(--tx2)}
+  .wchip .bar{height:44px;width:100%;border-radius:5px 5px 0 0;background:#22222e;position:relative;overflow:hidden}
+  .wchip .bar i{position:absolute;left:0;right:0;bottom:0;height:0%;transition:height .6s}
+  .wchip .bar i.good{background:linear-gradient(180deg,#2fe66f,#15703a)}
+  .wchip .bar i.bad{background:linear-gradient(180deg,#ff4d5e,#8e1b28)}
+  .wchip.cur .bar{box-shadow:0 0 0 1px var(--cy)}
+  .wchip .wl{font-size:9.5px;color:var(--tx3)}
+  .wlegend{font-size:10px;color:var(--tx3);margin-top:6px}
+  /* five-way */
+  .sync{display:flex;flex-direction:column;gap:5px}
+  .sync .it{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:8px;
+    padding:5px 8px;background:var(--card2);font-size:12px}
+  .sync .it .ic{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;background:#22222e;font-size:12px;flex:none}
+  .sync .it .nm{flex:1}
+  .sync .it .stt{font-size:11px;color:var(--tx3)}
+  .sync .it.done{border-color:#123b26}
+  .sync .it.done .ic{background:#123b26;color:var(--ok)}
+  .sync .it.done .stt{color:var(--ok)}
+  .sync .it.work .stt{color:var(--cy)}
+  .sync .it .prog{height:4px;border-radius:2px;background:#23232f;width:76px;overflow:hidden;flex:none}
+  .sync .it .prog i{display:block;height:100%;width:0;background:var(--cy)}
+  .switch-timer{text-align:center;font-size:22px;font-weight:750;color:var(--cy);letter-spacing:1px}
+  /* digital human */
+  .duo{display:grid;grid-template-columns:1fr auto;gap:6px 10px;font-size:11.5px}
+  .duo .p{color:var(--tx2)}
+  .duo .b{color:var(--tx)}
+  .cap{background:#101018;border:1px dashed #2a2a3a;border-radius:8px;padding:6px 9px;margin-top:8px;font-size:11.5px}
+  .cap .zh{color:var(--cy)}
+  .cap .ms{color:var(--tx2);margin-top:2px;font-style:italic}
+  /* chart */
+  #cvs{width:100%;height:130px;display:block}
+  .substats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+  .bars{display:flex;flex-direction:column;gap:6px}
+  .bars .row{display:grid;grid-template-columns:64px 1fr 42px;gap:7px;align-items:center;font-size:11.5px;color:var(--tx2)}
+  .bars .row .tr{height:9px;border-radius:5px;background:#22222e;overflow:hidden}
+  .bars .row .tr i{display:block;height:100%;width:0%;border-radius:5px;background:linear-gradient(90deg,#25f4ee,#a970ff);transition:width .8s}
+  .bars .row b{color:var(--tx);text-align:right}
+  .mini-h{font-size:11px;color:var(--tx3);margin:8px 0 4px;display:flex;justify-content:space-between}
+  /* comments */
+  .feed{flex:1;overflow:hidden;display:flex;flex-direction:column;gap:5px;padding-right:2px}
+  .msg{display:flex;gap:7px;align-items:flex-start;animation:slide .25s}
+  @keyframes slide{from{transform:translateY(8px);opacity:0}}
+  .msg .av{width:24px;height:24px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:11px;background:#2a1a2e;color:#ffb0d8}
+  .msg .b .who{font-size:11px;color:var(--tx3)}
+  .msg .b .txt{font-size:12px;word-break:break-all}
+  .msg .b .meta{margin-top:2px;display:flex;gap:5px;flex-wrap:wrap}
+  .tag{font-size:9.5px;border-radius:4px;padding:0 5px;border:1px solid var(--line);color:var(--tx2)}
+  .tag.hit{color:var(--ok);border-color:#123b26;background:#0e2016}
+  .tag.zh{color:var(--cy);border-color:#0e2e2c}
+  .msg.sys .av{background:#12332c;color:#7df0e4}
+  .msg.sys .txt{color:#9be9e2}
+  /* log */
+  .log{flex:1;overflow-y:auto;font-family:Consolas,"Cascadia Mono",monospace;font-size:11px;line-height:1.6}
+  .log .li{display:flex;gap:8px;border-bottom:1px dashed #1c1c26;padding:2px 0}
+  .log .li .t{color:var(--tx3);flex:none}
+  .log .li .tag2{flex:none;width:46px;text-align:center;border-radius:4px;font-size:9.5px;padding:0 2px;align-self:center}
+  .log .li.ok .tag2{background:#0e2016;color:var(--ok)}
+  .log .li.warn .tag2{background:#241a06;color:var(--warn)}
+  .log .li.bad .tag2{background:#25090e;color:var(--bad)}
+  .log .li.info .tag2{background:#101827;color:#6fb4ff}
+  .log .li .tx{color:var(--tx2)}
+  .log .li .tx b{color:var(--tx);font-weight:600}
+  /* alert */
+  .alert{position:fixed;left:50%;top:72px;transform:translate(-50%,-30px);opacity:0;pointer-events:none;
+    background:linear-gradient(135deg,#1d0e13,#241019);border:1px solid #7c2233;border-radius:13px;
+    padding:12px 18px;min-width:520px;max-width:720px;z-index:50;box-shadow:0 12px 40px rgba(0,0,0,.55);
+    transition:.35s}
+  .alert.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+  .alert .head{display:flex;align-items:center;gap:10px}
+  .alert .head .av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#12332c,#2a1a2e);
+    display:grid;place-items:center;font-weight:700;color:#7df0e4;font-size:15px}
+  .alert .head .who{font-size:12px;color:var(--tx3)}
+  .alert .head .who b{color:#ff8fa0;font-size:14px}
+  .alert .msg2{font-size:14.5px;margin-top:8px;line-height:1.6}
+  .alert .msg2 .hl{color:var(--bad);font-weight:700}
+  .alert .foot{margin-top:8px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--tx3)}
+  .alert .foot .ct{color:var(--cy);font-weight:600;font-size:13px}
+  ::-webkit-scrollbar{width:6px;height:6px}
+  ::-webkit-scrollbar-thumb{background:#2c2c3a;border-radius:3px}
+  @media (max-width:1420px){
+    .wrap{grid-template-columns:minmax(300px,360px) minmax(460px,1fr) minmax(280px,340px)}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><span class="dot">▶</span>
+    <span>TikTok Shop LIVE 直播中控台<small>LIVE CENTER · 模拟环境 · 马来西亚站</small></span>
+  </div>
+  <span class="chip drill">演练模式 · 无真实推流/观众/成交</span>
+  <span class="chip"><span>当前讲品</span><b id="hd-prod">1号 国风刺绣四件套</b></span>
+  <span class="chip ok"><span>数字人马来语输出</span></span>
+  <span class="spacer"></span>
+  <div class="stage-pill"><i class="live" id="liveDot"></i><span id="stageLabel">演练脚本加载中…</span></div>
+  <div class="btns">
+    <button id="btnPlay" class="primary">▶ 开始演示</button>
+    <button id="btnPause">⏸ 暂停</button>
+    <button id="btnFast">⚡ 快进至切品</button>
+    <button id="btnReset">⟲ 重播</button>
+    <select id="speed"><option value="1">1×</option><option value="2" selected>2×</option><option value="4">4×</option></select>
+    <label class="cb"><input type="checkbox" id="loop" checked>循环</label>
+  </div>
+  <div class="clock">直播时长 <b id="elapsed">00:00:00</b><br><span id="clock">--:--:--</span></div>
+</header>
+
+<div class="kpis">
+  <div class="kpi hot"><div class="l">实时在线</div><div class="v num" id="k-online">0</div><div class="s">峰值在线 <b class="num" id="k-peak">0</b></div></div>
+  <div class="kpi"><div class="l">累计观看</div><div class="v num" id="k-views">0</div><div class="s">观看时长合计 <span class="num" id="k-watch">0</span></div></div>
+  <div class="kpi"><div class="l">点赞 <span class="u" id="k-like-r"></span></div><div class="v num" id="k-likes">0</div><div class="s">点赞率 <span class="num" id="k-like-rt">--</span></div></div>
+  <div class="kpi"><div class="l">评论</div><div class="v num" id="k-comments">0</div><div class="s">弹幕意图命中 <b class="num" id="k-intent">95.6%</b></div></div>
+  <div class="kpi"><div class="l">分享</div><div class="v num" id="k-shares">0</div><div class="s">转发率 <span class="num" id="k-share-rt">--</span></div></div>
+  <div class="kpi"><div class="l">新增粉丝</div><div class="v num" id="k-follows">0</div><div class="s">粉丝点击率 <span class="num" id="k-fol-rt">--</span></div></div>
+  <div class="kpi"><div class="l">平均观看时长</div><div class="v num" id="k-avg">--</div><div class="s">完播/留存参考 41%</div></div>
+  <div class="kpi"><div class="l">商品卡曝光</div><div class="v num" id="k-imp">0</div><div class="s">当前商品 <span id="k-imp-p">1号</span></div></div>
+  <div class="kpi"><div class="l">商品卡点击</div><div class="v num" id="k-clicks">0</div><div class="s">窗口点击率 <span class="num" id="k-ctr">--</span></div></div>
+  <div class="kpi"><div class="l">成交订单 <span class="u">(演练)</span></div><div class="v num" id="k-orders">0</div><div class="s">GPM <b>—</b> · 无真实成交</div></div>
+  <div class="kpi"><div class="l">GMV <span class="u">(演练)</span></div><div class="v num" id="k-gmv">—</div><div class="s">马来西亚站不产生真实订单</div></div>
+  <div class="kpi"><div class="l">链路质量 <span class="u">(演练③基准)</span></div><div class="v num" id="k-link">99.4%</div><div class="s">马来语字幕时延 <b>1.2s</b> · 一致率 99.4%</div></div>
+</div>
+
+<div class="wrap">
+  <!-- ============ LEFT ============ -->
+  <div class="col">
+    <div class="panel">
+      <h3>当前讲品 · 商品卡监测<span class="r">TikTok Shop 商品卡数据</span></h3>
+      <div class="prod">
+        <div class="thumb"><span class="no" id="p-no">1号</span><span class="img" id="p-img">🛏️</span></div>
+        <div class="pinfo">
+          <div class="nm"><span id="p-name">云锦 · 国风刺绣四件套</span><span class="tag" id="p-tag">直播主推款</span></div>
+          <div class="sub" id="p-sub">新疆长绒棉 · A类母婴级 · 防螨 / 热湿调节 · 真实刺绣工艺</div>
+          <div class="row2">
+            <span>售价 <b class="price" id="p-price">RM 429</b></span>
+            <span>点击率基线 <b id="p-base">1.55%</b></span>
+            <span>讲解人 <b>白露(真人中文)</b></span>
+          </div>
+        </div>
+      </div>
+      <div class="sig">
+        <div class="cur">
+          <div class="big num" id="sig-val" style="color:var(--ok)">—</div>
+          <div class="cap">商品卡点击信号指数</div>
+        </div>
+        <div class="gbox">
+          <div class="lab"><span>基线水平 = 1.00</span><span>信号 = 窗口点击率 ÷ 基线点击率</span></div>
+          <div class="gauge"><div class="fill" id="sig-fill"></div><div class="thr"></div></div>
+        </div>
+      </div>
+      <div class="judge">
+        <span>规则判定：</span><span class="st idle" id="sig-judge">观察中…</span>
+        <span style="color:var(--tx3)">｜ 连续 2 个观察窗口信号 &lt; 0.70 才触发切品</span>
+      </div>
+      <div class="wins" id="wins"></div>
+      <div class="wlegend">观察窗口 <b id="winNo">W1</b> · 每窗口 <b id="winSec">10s</b>（可调速）｜红 = 低于阈值 0.70</div>
+      <div style="height:4px;background:#23232f;border-radius:2px;margin-top:8px;overflow:hidden">
+        <div id="winProg" style="height:100%;width:0%;background:var(--cy)"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>运营信号联动 · 五路同步切换<span class="r">规则引擎 → 自动执行</span></h3>
+      <div class="sync" id="syncBox">
+        <div class="it done"><span class="ic">🧺</span><span class="nm">讲解商品切换</span><span class="stt" data-st="d1">已同步</span><span class="prog"><i style="width:100%"></i></span></div>
+        <div class="it done"><span class="ic">🃏</span><span class="nm">商品卡联动更新</span><span class="stt" data-st="d2">已同步</span><span class="prog"><i style="width:100%"></i></span></div>
+        <div class="it done"><span class="ic">🎬</span><span class="nm">视觉场景切换 (OBS)</span><span class="stt" data-st="d3">已同步</span><span class="prog"><i style="width:100%"></i></span></div>
+        <div class="it done"><span class="ic">🎙️</span><span class="nm">讲解话术切换 (白露)</span><span class="stt" data-st="d4">已同步</span><span class="prog"><i style="width:100%"></i></span></div>
+        <div class="it done"><span class="ic">🌐</span><span class="nm">马来语输出同步 (数字人)</span><span class="stt" data-st="d5">已同步</span><span class="prog"><i style="width:100%"></i></span></div>
+      </div>
+      <div id="switchBar" style="display:none;margin-top:7px;text-align:center">
+        <div class="switch-timer" id="switchTimer">0.0s</div>
+        <div style="font-size:11px;color:var(--tx3)">五路同步切换倒计时（演练口径约 8 秒）</div>
+      </div>
+    </div>
+
+    <div class="panel grow" style="min-height:150px">
+      <h3>数字人链路 · 实时转译<span class="r">白露中文 → 马来语字幕</span></h3>
+      <div class="duo">
+        <span class="p">声音输入</span><span class="b">白露（真人出镜·中文讲品）</span>
+        <span class="p">系统转译</span><span class="b">实时语音识别 → 马来语合成</span>
+        <span class="p">输出</span><span class="b">数字人马来语 · 字幕时延 1.2s · 同步一致率 99.4%</span>
+      </div>
+      <div class="cap">
+        <div class="zh" id="cap-zh">“现在给大家介绍的是我们的 1 号床品……”</div>
+        <div class="ms" id="cap-ms">“Sekarang saya perkenalkan produk nombor satu kami……”</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MIDDLE ============ -->
+  <div class="col">
+    <div class="panel grow" style="min-height:220px">
+      <h3>实时在线人数曲线<span class="r">演练信号 · 非真实流量</span></h3>
+      <canvas id="cvs"></canvas>
+      <div class="substats">
+        <div>
+          <div class="mini-h"><span>流量来源结构</span><span>实时</span></div>
+          <div class="bars" id="srcBars"></div>
+        </div>
+        <div>
+          <div class="mini-h"><span>观众画像</span><span>马来西亚站</span></div>
+          <div class="bars" id="audBars"></div>
+        </div>
+      </div>
+    </div>
+    <div class="panel" style="flex:1.15;min-height:220px">
+      <h3>直播过程事件日志<span class="r">窗口判定 / 规则触发 / 切换动作</span></h3>
+      <div class="log" id="logBox"></div>
+    </div>
+  </div>
+
+  <!-- ============ RIGHT ============ -->
+  <div class="col">
+    <div class="panel grow" style="min-height:260px">
+      <h3>实时弹幕 · 意图识别与知识库应答<span class="r">命中 <b class="num" id="hitRate" style="color:var(--ok)">95.6%</b></span></h3>
+      <div class="feed" id="feed"></div>
+    </div>
+    <div class="panel" style="flex:1.3;min-height:230px">
+      <h3>切品规则引擎<span class="r">rule: 连续两窗口 &lt; 0.70</span></h3>
+      <div style="font-size:11.5px;color:var(--tx2);line-height:1.7">
+        <div>❶ 每个观察窗口结束，计算当前讲品「商品卡点击信号」= 窗口商品卡点击率 ÷ 基线点击率；</div>
+        <div>❷ 信号 &lt; 0.70 记 1 次「低于标准」；单窗口波动<b style="color:var(--tx)">不触发</b>，继续观察下一窗口；</div>
+        <div>❸ 连续 2 个观察窗口均低于 0.70 → 触发切品建议（腊八·数据判断岗）；</div>
+        <div>❹ 确认后五路同步切换（商品/商品卡/场景/话术/马来语），约 8 秒完成；</div>
+        <div style="color:var(--warn)">❺ 演练环境：切换后<b>不宣称“流量恢复”</b>，仅按信号继续观察，等待真实平台首测。</div>
+      </div>
+      <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+        <span class="tag zh">观察窗口 W1–W9</span>
+        <span class="tag hit">1号 触发 0.64 / 0.58</span>
+        <span class="tag">2号 信号恢复 0.80↑</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- alert -->
+<div class="alert" id="alertBox">
+  <div class="head">
+    <span class="av">腊</span>
+    <div><div class="who">【数据判断岗 · 腊八】运营信号监控</div><div>实时语音协同 · 规则引擎判定</div></div>
+  </div>
+  <div class="msg2">“当前演练场景中，<span class="hl">1 号商品连续两个观察窗口商品点击信号低于设定标准</span>（0.64 / 0.58 &lt; 0.70），建议切换 2 号继续验证。”</div>
+  <div class="foot"><span>演练信号 · 连续两窗口触发 · 非真实流量波动</span><span class="ct" id="alertCt">4.0s 后自动执行 →</span></div>
+</div>
+
+<script>
+"use strict";
+/* ================= 工具 ================= */
+const $ = id => document.getElementById(id);
+const fmt = n => Math.round(n).toLocaleString('en-US');
+const pad = (n, l = 2) => String(n).padStart(l, '0');
+const tnow = () => {
+  const d = new Date(); return pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+};
+const rnd = (a, b) => a + Math.random() * (b - a);
+
+/* ================= 产品数据 ================= */
+const PRODUCTS = {
+  1: { no: '1号', img: '🛏️', name: '云锦 · 国风刺绣四件套', tag: '直播主推款',
+       sub: '新疆长绒棉 · A类母婴级 · 防螨/热湿调节 · 真实刺绣工艺', price: 'RM 429', base: '1.55%' },
+  2: { no: '2号', img: '🛋️', name: '喜鹊 · 婚庆子母床品套装', tag: '卧室场景组合款',
+       sub: '卧室整体搭配 · 子母被+枕芯2只 · 婚庆国风场景 · 提升睡眠体验', price: 'RM 649', base: '1.42%' }
+};
+
+/* ================= 状态 ================= */
+const S = {
+  running: false, speed: 1, t: 0,           // 直播秒数
+  stage: 'boot',                             // boot|s1|alert|switch|s2|done
+  winLen: 10,                                // 观察窗口秒数
+  winAcc: 0, winNo: 0, winVal: [],           // 已结算窗口
+  online: 5280, peak: 5280,
+  views: 138640, likes: 84210, comments: 3820, shares: 1280, follows: 316,
+  avg: 96, imp: 1286300, clicks: 17420,
+  watchMin: 0, watchAdd: 0,
+  prod: 1,
+  fastMode: false,
+  capIdx: 0, capAcc: 0, chatAcc: 0,
+  lastTick: null
+};
+const S1_BASE = [0.97, 0.93, 0.89, 0.85, 0.81, 0.68, 0.72, 0.64, 0.58];
+const S2_BASE = [0.74, 0.80, 0.85, 0.88, 0.90, 0.89];
+const SPEAK1_ZH = [
+  "现在给大家介绍的是我们的 1 号床品。面料信息可以在商品卡中查看，这里还能看到真实刺绣的针脚和纹理……",
+  "这款用的是新疆长绒棉，A 类母婴级标准，贴身睡也很安心……",
+  "防螨、热湿调节，喜欢出汗的朋友可以重点看看这款……"
+];
+const SPEAK1_MS = [
+  "Sekarang saya perkenalkan produk nombor satu kami. Maklumat fabrik boleh dilihat pada kad produk, jahitan sulaman sebenar juga dipaparkan……",
+  "Produk ini diperbuat daripada kapas Xinjiang, standard A untuk bayi dan ibu, selesa dipakai terus……",
+  "Anti-hama, kawalan suhu dan kelembapan. Rakan yang mudah berpeluh boleh fokus pada produk ini……"
+];
+const SPEAK2_ZH = [
+  "接下来我们换到 2 号商品。这款更突出卧室整体搭配和日常使用场景……",
+  "想要空间效果的朋友，可以重点看直播间现在展示的这组卧室画面……",
+  "2 号套装包含子母被和枕芯，搭配国风婚庆元素，铺出来就是一个完整卧室方案……"
+];
+const SPEAK2_MS = [
+  "Sekarang kita tukar kepada produk nombor dua. Produk ini menonjolkan padanan keseluruhan bilik tidur dan senario harian……",
+  "Rakan yang mementingkan kesan ruang boleh fokus pada paparan bilik tidur ini……",
+  "Set nombor dua termasuk selimut induk-anak dan bantal, dengan elemen perkahwinan gaya Cina……"
+];
+const COMMENTS = [
+  { t: '这个刺绣是手工的吗？还是机绣？', tag: '工艺咨询' },
+  { t: 'Berapa harga selepas diskaun?', tag: '价格咨询' },
+  { t: '面料会不会起球？', tag: '材质咨询' },
+  { t: 'Ada saiz king tak?', tag: '尺码咨询' },
+  { t: 'A 类母婴级是什么意思，婴儿能用吗？', tag: '安全咨询' },
+  { t: 'Penghantaran ke Sabah berapa hari?', tag: '物流咨询' },
+  { t: '1号还有货吗？加购了怎么没反应', tag: '商品卡问题' },
+  { t: 'Boleh tukar dengan produk nombor dua?', tag: '商品咨询' },
+  { t: '主播这套床品洗了会不会缩水？', tag: '材质咨询' },
+  { t: '红包怎么领？', tag: '活动咨询' },
+  { t: '热湿调节真的有用吗？', tag: '卖点咨询' },
+  { t: '2号套装包含几个枕头？', tag: '规格咨询' },
+  { t: 'Malaysia boleh COD tak?', tag: '支付咨询' },
+  { t: '跟刚才的刺绣款比，哪个更厚实？', tag: '对比咨询' }
+];
+const CHAT_NAMES = ['Maya_Lee', '阿伟家纺采购', 'KakLina', '小鹿乱撞', 'Aiman88', '睡个好觉zZ', 'Syafiqah', 'Vivi日常', '床上用品研究所', 'Nadia_KL', '羊羊爱盖被', 'Haziq'];
+const CHAT_AV = ['👩', '👨', '👩', '🧑', '👨', '🧒', '👩', '👧', '🧔', '👩', '🧑', '👨'];
+
+/* ================= 文案渲染 ================= */
+const capZh = () => S.prod === 1 ? SPEAK1_ZH[S.capIdx % SPEAK1_ZH.length] : SPEAK2_ZH[S.capIdx % SPEAK2_ZH.length];
+const capMs = () => S.prod === 1 ? SPEAK1_MS[S.capIdx % SPEAK1_MS.length] : SPEAK2_MS[S.capIdx % SPEAK2_MS.length];
+
+function setStage(st, label) {
+  S.stage = st;
+  $('stageLabel').textContent = label;
+}
+
+function log(tag, txt) {
+  const box = $('logBox');
+  const div = document.createElement('div');
+  div.className = 'li ' + tag;
+  div.innerHTML = '<span class="t">' + tnow() + '</span><span class="tag2">' + tag + '</span><span class="tx">' + txt + '</span>';
+  box.prepend(div);
+  while (box.children.length > 40) box.lastChild.remove();
+}
+
+function pushChat(sys, text, tags) {
+  const feed = $('feed');
+  const d = document.createElement('div');
+  d.className = 'msg' + (sys ? ' sys' : '');
+  if (sys) {
+    d.innerHTML = '<span class="av">🤖</span><div class="b"><div class="txt">' + text + '</div></div>';
+  } else {
+    const nm = CHAT_NAMES[Math.floor(Math.random() * CHAT_NAMES.length)];
+    const av = CHAT_AV[Math.floor(Math.random() * CHAT_AV.length)];
+    let meta = '';
+    for (const tg of tags) meta += '<span class="tag' + (tg.indexOf('命中') >= 0 ? ' hit' : '') + '">' + tg + '</span>';
+    d.innerHTML = '<span class="av">' + av + '</span><div class="b"><div class="who">' + nm + '</div><div class="txt">' + text + '</div><div class="meta">' + meta + '</div></div>';
+  }
+  feed.prepend(d);
+  while (feed.children.length > 26) feed.lastChild.remove();
+}
+
+/* ================= 产品渲染 ================= */
+function applyProduct() {
+  const p = PRODUCTS[S.prod];
+  $('p-no').textContent = p.no;
+  $('p-img').textContent = p.img;
+  $('p-name').textContent = p.name;
+  $('p-tag').textContent = p.tag;
+  $('p-sub').textContent = p.sub;
+  $('p-price').textContent = p.price;
+  $('p-base').textContent = p.base;
+  $('hd-prod').textContent = p.no + ' ' + p.name;
+  $('k-imp-p').textContent = p.no;
+  $('cap-zh').textContent = '“' + capZh() + '”';
+  $('cap-ms').textContent = capMs();
+}
+
+/* ================= 窗口引擎 ================= */
+function windowBase() {
+  if (S.stage === 's1') return S1_BASE;
+  if (S.stage === 's2' || S.stage === 'done') return S2_BASE;
+  return [];
+}
+function windowValue(idx) {
+  const list = windowBase();
+  if (idx >= list.length) return list[list.length - 1] + rnd(-0.01, 0.03);
+  const base = list[idx];
+  const jit = base >= 0.70 ? rnd(0, 0.02) : -rnd(0, 0.02);
+  let v = base + jit;
+  if (base >= 0.70 && v < 0.70) v = 0.70 + rnd(0, 0.005);
+  if (base < 0.70 && v >= 0.70) v = 0.70 - rnd(0.005, 0.02);
+  return Math.max(0.15, Math.min(1.25, v));
+}
+function renderWin() {
+  const box = $('wins');
+  box.innerHTML = '';
+  const arr = S.winVal.slice(-8);
+  const maxH = 0.70 * 1.45;
+  for (let i = 0; i < 8; i++) {
+    const v = arr[i];
+    const div = document.createElement('div');
+    div.className = 'wchip' + (i === arr.length - 1 && (S.stage === 's1' || S.stage === 's2') ? ' cur' : '');
+    if (v === undefined) {
+      div.innerHTML = '<span class="wv">--</span><span class="bar"><i style="height:2%"></i></span><span class="wl">—</span>';
+    } else {
+      const good = v >= 0.70;
+      div.innerHTML = '<span class="wv num">' + v.toFixed(2) + '</span><span class="bar"><i class="' +
+        (good ? 'good' : 'bad') + '" style="height:' + (Math.min(v / maxH, 1.25) * 100) + '%"></i></span><span class="wl">W' +
+        (S.winNo - (arr.length - 1 - i)) + '</span>';
+    }
+    box.appendChild(div);
+  }
+  $('winNo').textContent = 'W' + S.winNo;
+}
+function renderSignal() {
+  const last = S.winVal.length ? S.winVal[S.winVal.length - 1] : null;
+  const el = $('sig-val');
+  const fill = $('sig-fill');
+  const judge = $('sig-judge');
+  if (last === null) {
+    el.textContent = '—'; el.style.color = 'var(--tx3)';
+    fill.style.width = '0%'; fill.classList.remove('bad');
+    judge.textContent = '等待首个窗口结算…'; judge.className = 'st idle';
+    return;
+  }
+  const good = last >= 0.70;
+  el.textContent = last.toFixed(2);
+  el.style.color = good ? 'var(--ok)' : 'var(--bad)';
+  fill.style.width = Math.min(last / 1.25 * 100, 100) + '%';
+  fill.classList.toggle('bad', !good);
+  if (S.stage === 'alert') { judge.textContent = '连续两窗口 < 0.70 → 已触发切品建议'; judge.className = 'st bad'; }
+  else if (S.stage === 'switch') { judge.textContent = '五路同步切换执行中…'; judge.className = 'st watch'; }
+  else if (S.stage === 's2') { judge.textContent = '2号讲解中 · 信号观察'; judge.className = 'st ok'; }
+  else if (S.stage === 'done') { judge.textContent = '演练结束 · 2号信号保持健康 (0.85↑)'; judge.className = 'st ok'; }
+  else if (last < 0.70) { judge.textContent = '单窗口低于阈值 · 继续观察'; judge.className = 'st watch'; }
+  else { judge.textContent = '信号正常 · 未触发'; judge.className = 'st ok'; }
+}
+function settleWindow() {
+  if (S.stage !== 's1' && S.stage !== 's2') return;
+  S.winNo++;
+  const base = windowBase();
+  const v = windowValue(S.winNo - 1);
+  S.winVal.push(v);
+  if (S.stage === 's1') {
+    // 点击量按窗口累加（信号走弱的商品点击增量小）
+    const inc = Math.round(S.online * (0.0016 + rnd(0, 0.0004)) * S.winLen / 8);
+    S.clicks += inc;
+    log(v >= 0.70 ? 'info' : 'warn',
+        '窗口 W' + S.winNo + ' 结算：1号 商品卡点击信号 = <b>' + v.toFixed(2) + '</b>（阈值 0.70）· 窗口点击 +' + fmt(inc));
+    const arr = S.winVal.slice(-2);
+    if (S.winNo >= 3 && arr.length === 2 && arr[0] < 0.70 && arr[1] < 0.70) {
+      log('bad', '<b>连续两个观察窗口低于 0.70（' + arr[0].toFixed(2) + ' / ' + arr[1].toFixed(2) + '）→ 规则触发切品建议</b>');
+      fireAlert();
+      return;
+    }
+    if (S.winNo >= 2 && S.winVal[S.winVal.length - 1] < 0.70 && S.winVal[S.winVal.length - 2] >= 0.70) {
+      log('info', '单窗口波动（W' + (S.winNo - 1) + '）→ 按规则<b>不触发</b>，观察下一窗口');
+    }
+    if (S.winNo >= S1_BASE.length + 2 && S.stage === 's1') {
+      log('warn', '1号 已达脚本窗口上限仍未触发（异常兜底）→ 强制进入切品演练');
+      S.winVal.push(0.60); S.winVal.push(0.55);
+      fireAlert();
+      return;
+    }
+  } else {
+    S.clicks += Math.round(S.online * (0.0038 + rnd(0, 0.0006)) * S.winLen / 8);
+    log(v >= 0.70 ? 'ok' : 'warn',
+        '窗口 W' + S.winNo + ' 结算：2号 商品卡点击信号 = <b>' + v.toFixed(2) + '</b>（阈值 0.70）· 窗口点击 +' + fmt(S.clicks));
+    if (S.winNo >= 3 && S.winVal.slice(-2).every(x => x >= 0.70)) {
+      log('ok', '2号 连续多窗口信号 ≥0.70 → <b>信号保持健康，本轮演练验证完成</b>');
+    }
+    if (S.winNo >= (S2_BASE.length + 2)) {
+      setStage('done', '演练结束 · 2号信号健康 (0.85↑) · 观测中');
+      log('ok', '<b>本轮演练脚本完成</b>：1号触发规则 → 五路切换 → 2号信号恢复 0.85↑；未宣称“流量恢复”。');
+      if ($('loop').checked) {
+        setTimeout(reset, 6000);
+      } else {
+        S.running = false; $('btnPlay').textContent = '▶ 继续观测';
+      }
+    }
+  }
+  renderWin(); renderSignal();
+}
+/* ================= 切品流程 ================= */
+const SYNC_ITEMS = ['讲解商品切换', '商品卡联动更新', '视觉场景切换 (OBS)', '讲解话术切换 (白露)', '马来语输出同步 (数字人)'];
+function renderSync(done) {
+  const box = $('syncBox');
+  box.innerHTML = '';
+  SYNC_ITEMS.forEach((nm, i) => {
+    const d = document.createElement('div');
+    const icons = ['🧺', '🃏', '🎬', '🎙️', '🌐'];
+    if (done > i) {
+      d.className = 'it done';
+      d.innerHTML = '<span class="ic">' + icons[i] + '</span><span class="nm">' + nm + '</span><span class="stt">已同步 ✓</span><span class="prog"><i style="width:100%"></i></span>';
+    } else if (done === i) {
+      d.className = 'it work';
+      d.innerHTML = '<span class="ic">' + icons[i] + '</span><span class="nm">' + nm + '</span><span class="stt">切换中…</span><span class="prog"><i id="syncProg" style="width:0%"></i></span>';
+    } else {
+      d.className = 'it';
+      d.innerHTML = '<span class="ic">' + icons[i] + '</span><span class="nm">' + nm + '</span><span class="stt">等待</span><span class="prog"><i></i></span>';
+    }
+    box.appendChild(d);
+  });
+}
+function fireAlert() {
+  if (S.stage !== 's1') return;
+  setStage('alert', '⚠ 1号连续两窗口信号 < 0.70');
+  renderSignal();
+  const box = $('alertBox');
+  box.classList.add('show');
+  $('alertCt').textContent = '4.0s 后自动执行 →';
+  log('bad', '腊八（数据判断岗）：<b>“1号连续两窗口低于标准 → 建议切 2 号继续验证”</b>（演练信号）');
+  S.alertT = 4.0;
+}
+function execSwitch() {
+  $('alertBox').classList.remove('show');
+  setStage('switch', '五路同步切换执行中…');
+  $('switchBar').style.display = 'block';
+  renderSync(0);
+  log('warn', '夏至（运营）：<b>收到，执行切品 → 切换至 2 号</b>');
+  const dur = 8.0;
+  const t0 = performance.now();
+  const stepDur = dur / 5;
+  let lastStep = -1;
+  const tick = () => {
+    if (!S.running) { requestAnimationFrame(tick); return; }
+    const dt = (performance.now() - t0) / 1000;
+    const el = $('switchTimer');
+    if (dt < dur) {
+      el.textContent = Math.max(0, dur - dt).toFixed(1) + 's';
+      const cur = Math.min(4, Math.floor(dt / stepDur));
+      if (cur !== lastStep) {
+        lastStep = cur;
+        renderSync(cur);
+        if (cur > 0) {
+          log('ok', '五路同步 · ' + (cur + 1) + '/5：<b>' + SYNC_ITEMS[cur - 1] + '</b> 已完成');
+        }
+      }
+      const prog = $('syncProg');
+      if (prog) prog.style.width = Math.min(100, (dt % stepDur) / stepDur * 100) + '%';
+      requestAnimationFrame(tick);
+    } else {
+      el.textContent = dur.toFixed(1) + 's';
+      renderSync(5);
+      log('ok', '五路同步 · 5/5：<b>马来语输出同步完成</b>（全程 ' + dur.toFixed(1) + 's）');
+      finishSwitch();
+    }
+  };
+  requestAnimationFrame(tick);
+}
+function finishSwitch() {
+  $('switchBar').style.display = 'none';
+  S.prod = 2;
+  S.winVal = [];
+  applyProduct();
+  S.winNo = 0;
+  S.winAcc = 0;
+  setStage('s2', '讲解 2号 · 信号观察中');
+  S.likes += 1280; // 场景切换互动脉冲（演练信号）
+  log('ok', '五路同步完成（约 8 秒）：商品 / 商品卡 / 视觉场景 / 讲解话术 / 马来语输出 → <b>2号 开始讲解</b>');
+  log('info', '白露：<b>“接下来我们换到 2 号商品……”</b>（马来语同步输出中）');
+  log('info', '演练纪律：切换后<b>不宣称“流量恢复”</b>，继续按观察窗口跟踪 2 号信号');
+  renderWin(); renderSignal();
+}
+
+/* ================= 曲线绘制 ================= */
+const hist = [];
+function drawChart() {
+  const cvs = $('cvs');
+  const dpr = window.devicePixelRatio || 1;
+  const w = cvs.clientWidth, h = cvs.clientHeight;
+  cvs.width = w * dpr; cvs.height = h * dpr;
+  const ctx = cvs.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, w, h);
+  const pts = hist.length > 1 ? hist : [S.online, S.online];
+  const lo = Math.min.apply(null, pts) * 0.97, hi = Math.max.apply(null, pts) * 1.03;
+  const padL = 4, padR = 4, padT = 8, padB = 14;
+  ctx.strokeStyle = '#23232f'; ctx.fillStyle = '#5c6270'; ctx.font = '10px sans-serif'; ctx.lineWidth = 1;
+  for (const g of [0.25, 0.5, 0.75]) {
+    const y = padT + (1 - g) * (h - padT - padB);
+    ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(w - padR, y); ctx.stroke();
+    ctx.fillText(fmt(lo + (hi - lo) * (1 - g)), 2, y + 3);
+  }
+  const grad = ctx.createLinearGradient(0, 0, 0, h);
+  grad.addColorStop(0, 'rgba(37,244,238,.25)'); grad.addColorStop(1, 'rgba(37,244,238,0)');
+  ctx.beginPath();
+  pts.forEach((v, i) => {
+    const x = padL + i / (pts.length - 1) * (w - padL - padR);
+    const y = padT + (1 - (v - lo) / (hi - lo)) * (h - padT - padB);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.strokeStyle = '#25f4ee'; ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.lineTo(w - padR, h - padB); ctx.lineTo(padL, h - padB); ctx.closePath();
+  ctx.fillStyle = grad; ctx.fill();
+  // peak marker
+  const pk = Math.max.apply(null, pts);
+  const yPk = padT + (1 - (pk - lo) / (hi - lo)) * (h - padT - padB);
+  ctx.setLineDash([3, 4]); ctx.strokeStyle = '#fe2c55';
+  ctx.beginPath(); ctx.moveTo(padL, yPk); ctx.lineTo(w - padR, yPk); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#fe2c55';
+  ctx.fillText('峰值 ' + fmt(pk), padL, yPk - 3);
+}
+
+/* ================= 流量来源 / 画像 ================= */
+const SRC = [
+  ['推荐页 (FYP)', 46], ['短视频引流', 21], ['关注页', 13], ['广告', 8], ['直播广场', 7], ['其他', 5]
+];
+const AUD = [
+  ['女性 68% / 男性 32%', 68], ['18–24岁', 34], ['25–34岁', 41], ['35–44岁', 17],
+  ['吉隆坡', 31], ['雪兰莪', 26], ['柔佛', 14], ['槟城', 11]
+];
+function drawBars() {
+  const sb = $('srcBars'); const ab = $('audBars');
+  sb.innerHTML = '';
+  SRC.forEach(x => {
+    const d = document.createElement('div');
+    d.className = 'row';
+    d.innerHTML = '<span>' + x[0] + '</span><span class="tr"><i style="width:' + (x[1] * 2.1) + '%"></i></span><b>' + x[1] + '%</b>';
+    sb.appendChild(d);
+  });
+  ab.innerHTML = '';
+  AUD.forEach(x => {
+    const d = document.createElement('div');
+    d.className = 'row';
+    d.innerHTML = '<span>' + x[0] + '</span><span class="tr"><i style="width:' + (x[1] * 2.2) + '%"></i></span><b>' + x[1] + '%</b>';
+    ab.appendChild(d);
+  });
+}
+
+/* ================= 主循环 ================= */
+function secTick() {
+  S.t += 1;
+  $('elapsed').textContent = pad(Math.floor(S.t / 3600)) + ':' + pad(Math.floor(S.t / 60) % 60) + ':' + pad(S.t % 60);
+  // 在线与峰值
+  let dn = 0;
+  if (S.stage === 's1') dn = -(rnd(1.2, 3.2));
+  else if (S.stage === 's2') dn = rnd(0.6, 2.6);
+  else if (S.stage === 'alert' || S.stage === 'switch') dn = -rnd(0.5, 1.6);
+  else dn = rnd(-1, 1.6);
+  S.online = Math.max(3850, Math.min(6400, S.online + dn));
+  S.peak = Math.max(S.peak, S.online);
+  S.views += rnd(6, 15);
+  // 互动
+  let lr = 26, cr = 1.2, sr = 0.32, fr = 0.12;
+  if (S.stage === 's2') { lr = 46; cr = 1.9; sr = 0.55; fr = 0.3; }
+  if (S.stage === 'alert' || S.stage === 'switch') { lr = 10; cr = 0.6; }
+  S.likes += rnd(lr * 0.7, lr * 1.3);
+  S.comments += rnd(cr * 0.7, cr * 1.3);
+  S.shares += rnd(sr * 0.7, sr * 1.3);
+  S.follows += rnd(fr * 0.7, fr * 1.3);
+  S.avg = S.stage === 's2' ? Math.min(148, S.avg + 0.06) : Math.max(88, S.avg - 0.04);
+  // 商品曝光（与在线联动）
+  S.imp += Math.round(rnd(34, 60) * (S.online / 5000));
+  // 每秒点击微量（主要增量在窗口结算时）
+  S.clicks += S.stage === 's2' ? rnd(0.6, 1.6) : rnd(0.15, 0.6);
+  // 更新 UI
+  $('k-online').textContent = fmt(S.online);
+  $('k-peak').textContent = fmt(S.peak);
+  $('k-views').textContent = fmt(S.views);
+  $('k-watch').textContent = fmt(S.views * S.avg / 3600) + ' 小时';
+  $('k-likes').textContent = fmt(S.likes);
+  $('k-comments').textContent = fmt(S.comments);
+  $('k-shares').textContent = fmt(S.shares);
+  $('k-follows').textContent = fmt(S.follows);
+  $('k-avg').textContent = Math.floor(S.avg / 60) + ':' + pad(Math.round(S.avg % 60));
+  $('k-imp').textContent = fmt(S.imp);
+  $('k-clicks').textContent = fmt(S.clicks);
+  $('k-ctr').textContent = (S.clicks / S.imp * 100).toFixed(2) + '%';
+  const likeRt = (S.likes / S.views * 100).toFixed(2) + '%';
+  $('k-like-rt').textContent = likeRt;
+  $('k-share-rt').textContent = (S.shares / S.views * 100).toFixed(3) + '%';
+  $('k-fol-rt').textContent = (S.follows / S.views * 100).toFixed(3) + '%';
+  hist.push(S.online);
+  if (hist.length > 240) hist.shift();
+  drawChart();
+}
+function chatTick() {
+  if (Math.random() < 0.75) {
+    const c = COMMENTS[Math.floor(Math.random() * COMMENTS.length)];
+    const hit = Math.random() < 0.955;
+    const tags = [c.tag];
+    if (hit) tags.push('知识库命中 ✓');
+    else tags.push('转人工复核');
+    pushChat(false, c.t, tags);
+    if (hit && Math.random() < 0.55) {
+      setTimeout(() => {
+        pushChat(true, '【数字人自动应答·马来语】Maklumat telah dijawab daripada pangkalan pengetahuan ✓ 已回复弹幕「' + c.t + '」');
+      }, 900);
+    }
+  }
+}
+function capTick() {
+  if (Math.random() < 0.25) {
+    S.capIdx++;
+    $('cap-zh').textContent = '“' + capZh() + '”';
+    $('cap-ms').textContent = capMs();
+  }
+}
+function windowTick() {
+  if (S.stage === 's1' || S.stage === 's2') {
+    S.winAcc += 1;
+    $('winProg').style.width = Math.min(100, S.winAcc / S.winLen * 100) + '%';
+    if (S.winAcc >= S.winLen) { S.winAcc = 0; settleWindow(); }
+  }
+}
+
+let timer = null;
+function tickLoop() {
+  secTick();
+  chatTick();
+  capTick();
+  windowTick();
+  if (S.stage === 'alert' && S.running) {
+    S.alertT -= 1;
+    $('alertCt').textContent = Math.max(0, S.alertT).toFixed(1) + 's 后自动执行 →';
+    if (S.alertT <= 0) execSwitch();
+  }
+  $('clock').textContent = tnow();
+}
+function startTimer() {
+  if (timer) clearInterval(timer);
+  timer = setInterval(() => { if (S.running) tickLoop(); }, 1000 / S.speed);
+}
+function reset() {
+  S.running = false;
+  $('btnPause').textContent = '⏸ 暂停';
+  $('alertBox').classList.remove('show');
+  $('switchBar').style.display = 'none';
+  S.t = 0; S.stage = 's1'; S.prod = 1;
+  S.winAcc = 0; S.winNo = 0; S.winVal = [];
+  S.online = 5280; S.peak = 5280;
+  S.views = 138640; S.likes = 84210; S.comments = 3820; S.shares = 1280; S.follows = 316;
+  S.avg = 96; S.imp = 1286300; S.clicks = 17420;
+  S.capIdx = 0; S.chatAcc = 0;
+  hist.length = 0;
+  $('elapsed').textContent = '00:00:00';
+  $('logBox').innerHTML = '';
+  $('feed').innerHTML = '';
+  applyProduct();
+  renderSync(5);
+  renderWin(); renderSignal();
+  drawBars();
+  setStage('s1', '讲解 1号 · 信号观察中');
+  log('info', '演练开始：白露真人中文讲品 → 实时转译 → 数字人马来语输出（TikTok Shop · 马来西亚站 · 内网演练环境）');
+  log('info', '规则就绪：商品卡点击信号指数 · 观察窗口 10s · 阈值 <b>0.70</b> · 连续两窗口触发');
+  log('info', '当前讲品：<b>1号 国风刺绣四件套</b>，基线商品卡点击率 1.55%');
+  startTimer();
+  S.running = true;
+  $('btnPlay').textContent = '▶ 开始演示';
+}
+function fastForward() {
+  reset();
+  // 快速推进窗口直至连续两窗口触发
+  const targets = S1_BASE.slice(0, 8); // 到 0.64/0.58 触发前一个窗口
+  for (let i = 0; i < 8; i++) {
+    S.winNo++;
+    let v = S1_BASE[i] + (i < 7 ? rnd(0, 0.01) : -rnd(0, 0.01));
+    S.winVal.push(v);
+  }
+  S.winNo++;
+  S.winVal.push(0.58 + rnd(-0.005, 0.005));
+  log('warn', '【快进】窗口推进至 W' + S.winNo + '：连续两窗口 0.64 / 0.58 < 0.70 → 触发');
+  renderWin(); renderSignal();
+  setStage('alert', '⚠ 1号连续两窗口信号 < 0.70');
+  $('alertBox').classList.add('show');
+  log('bad', '腊八（数据判断岗）：<b>“1号连续两窗口低于标准 → 建议切 2 号继续验证”</b>（演练信号）');
+  S.alertT = 4.0;
+}
+
+/* ================= 事件绑定 ================= */
+$('btnPlay').addEventListener('click', () => {
+  if (S.stage === 'done' || S.stage === 'boot') { reset(); return; }
+  if (!S.running) { S.running = true; $('btnPause').textContent = '⏸ 暂停'; }
+});
+$('btnPause').addEventListener('click', () => {
+  S.running = !S.running;
+  $('btnPause').textContent = S.running ? '⏸ 暂停' : '▶ 继续';
+});
+$('btnReset').addEventListener('click', reset);
+$('btnFast').addEventListener('click', fastForward);
+$('speed').addEventListener('change', e => {
+  S.speed = parseFloat(e.target.value);
+  startTimer();
+});
+
+window.addEventListener('resize', drawChart);
+
+/* ================= 启动 ================= */
+applyProduct();
+renderSync(5);
+renderWin();
+drawBars();
+setStage('boot', '演练脚本待命 · 点击「开始演示」');
+drawChart();
+startTimer();
+</script>
+</body>
+</html>
