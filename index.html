@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>zimu645-dotcom · 数据看板</title>
+<meta name="description" content="zimu645-dotcom 电商数据可视化大屏合集 — TikTok 直播 / 运营优化前后对比。">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                 "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: #0a0e17; color: #e5e7eb; line-height: 1.7;
+    min-height: 100vh; overflow-x: hidden;
+    background-image:
+      radial-gradient(ellipse at 15% 0%, rgba(37, 244, 238, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 85% 20%, rgba(254, 44, 85, 0.08) 0%, transparent 50%),
+      linear-gradient(rgba(148, 163, 184, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(148, 163, 184, 0.05) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 42px 42px, 42px 42px;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+  .hero { padding: 110px 0 46px; text-align: center; }
+  .hero .badge {
+    display: inline-block; font-size: 12px; letter-spacing: 2px; color: #7dd3fc;
+    border: 1px solid rgba(37,244,238,.3); background: rgba(37,244,238,.06);
+    padding: 4px 16px; border-radius: 30px; margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-size: clamp(30px, 5vw, 44px); font-weight: 800; letter-spacing: 1px;
+    background: linear-gradient(120deg, #f8fafc 20%, #67e8f9 55%, #fda4af 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .hero .sub { margin-top: 14px; color: #94a3b8; font-size: 16px; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding-bottom: 90px; }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+  .card {
+    position: relative; display: block; text-decoration: none; color: #e5e7eb;
+    background: rgba(17, 24, 39, 0.75); border: 1px solid rgba(148, 163, 184, 0.15);
+    border-radius: 20px; padding: 28px 24px 24px; overflow: hidden;
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    transition: transform .3s, border-color .3s, box-shadow .3s;
+  }
+  .card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px;
+    background: linear-gradient(90deg, transparent, var(--c), transparent); }
+  .card:hover { transform: translateY(-5px); border-color: rgba(148,163,184,.35); box-shadow: 0 18px 44px rgba(0,0,0,.5); }
+  .card .icon {
+    width: 56px; height: 56px; border-radius: 16px; font-size: 27px; margin-bottom: 16px;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, var(--c1), var(--c2));
+    box-shadow: 0 8px 24px rgba(0,0,0,.4);
+  }
+  .card h2 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+  .card p { font-size: 14px; color: #94a3b8; line-height: 1.6; min-height: 46px; }
+  .card .go { margin-top: 16px; font-size: 13px; color: var(--c); font-weight: 600; }
+  .card .go::after { content: ' →'; }
+  footer { text-align: center; padding-bottom: 34px; color: #64748b; font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <div class="badge">DATA DASHBOARDS</div>
+    <h1>电商运营数据看板</h1>
+    <p class="sub">多平台运营 / 直播数据 · 动态可视化大屏合集</p>
+  </section>
+
+  <div class="grid">
+    <a class="card" href="tiktok-live.html" style="--c:#fe2c55;--c1:#25f4ee;--c2:#fe2c55">
+      <div class="icon">🎥</div>
+      <h2>TikTok 直播数据</h2>
+      <p>最高在线、观看时长、点击率、互动/点赞/评论率、转化率、投流 ROI · 炫酷发光仪表盘</p>
+      <div class="go">进入看板</div>
+    </a>
+    <a class="card" href="operation-after.html" style="--c:#22c55e;--c1:#38bdf8;--c2:#22c55e">
+      <div class="icon">📈</div>
+      <h2>运营优化数据</h2>
+      <p>京东/抖音/独立站 优化后主图点击率、转化率 vs 优化前与行业参考 · 动态柱状对比</p>
+      <div class="go">进入看板</div>
+    </a>
+    <a class="card" href="operation-before.html" style="--c:#f59e0b;--c1:#f59e0b;--c2:#fe2c55">
+      <div class="icon">📉</div>
+      <h2>运营优化前基线</h2>
+      <p>三渠道优化前现状 vs 行业参考，落后差距一目了然 · 动态柱状对比</p>
+      <div class="go">进入看板</div>
+    </a>
+  </div>
+
+  <footer>© 2026 zimu645-dotcom · GitHub Pages</footer>
+</div>
+</body>
+</html>
