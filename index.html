@@ -32,8 +32,8 @@
     -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
   }
   .hero .sub { margin-top: 14px; color: #94a3b8; font-size: 16px; }
-  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding-bottom: 90px; }
-  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; padding-bottom: 90px; }
+  @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
   .card {
     position: relative; display: block; text-decoration: none; color: #e5e7eb;
     background: rgba(17, 24, 39, 0.75); border: 1px solid rgba(148, 163, 184, 0.15);
@@ -82,6 +82,12 @@
       <div class="icon">📉</div>
       <h2>运营优化前基线</h2>
       <p>三渠道优化前现状 vs 行业参考，落后差距一目了然 · 动态柱状对比</p>
+      <div class="go">进入看板</div>
+    </a>
+    <a class="card" href="tiktok-live-2.html" style="--c:#a78bfa;--c1:#25f4ee;--c2:#a78bfa">
+      <div class="icon">🎥</div>
+      <h2>TikTok 直播数据 2</h2>
+      <p>第二屏 TikTok 直播数据大屏：在线、时长、点击率、互动、ROI · 发光仪表盘</p>
       <div class="go">进入看板</div>
     </a>
   </div>
