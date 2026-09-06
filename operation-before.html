@@ -15,7 +15,10 @@
       --text: #e6edf7;
       --muted: #8b9bb4;
       --jd: #e1251b;
+      --tmall: #ff5000;
+      --pdd: #ff2146;
       --dy-pink: #fe2c55;
+      --ks: #ff4d2e;
       --web: #38bdf8;
       --green: #22c55e;
       --amber: #f59e0b;
@@ -104,6 +107,8 @@
     .kpi .value small { font-size: 11px; color: var(--muted); font-weight: 500; }
     .kpi .delta { font-size: 11px; margin-top: 2px; font-weight: 600; letter-spacing: .2px; }
     .gap { color: var(--amber); }
+    .ahead { color: var(--green); }
+    .near { color: #2dd4bf; }
 
     .legend { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; padding: 6px 0 12px; font-size: 14px; color: var(--muted); }
     .legend span { display: inline-flex; align-items: center; gap: 7px; }
@@ -126,7 +131,7 @@
     <div class="live"><span class="dot"></span> 优化前基线 · 图表循环动态</div>
   </header>
 
-  <!-- ============ 顶部概览：3 渠道（优化前） ============ -->
+  <!-- ============ 顶部概览：6 平台（优化前） ============ -->
   <div class="grid cols-3" style="margin-bottom:18px">
 
     <!-- 京东 -->
@@ -139,12 +144,12 @@
         <div class="kpi">
           <div class="label">优化前主图点击率</div>
           <div class="value">1.83<small>%</small></div>
-          <div class="delta gap">▼ 落后行业 0.37pp</div>
+          <div class="delta gap">▼ 落后行业 0.29pp</div>
         </div>
         <div class="kpi">
           <div class="label">优化前转化率</div>
-          <div class="value">2.01<small>%</small></div>
-          <div class="delta gap">▼ 落后行业 0.49pp</div>
+          <div class="value">1.95<small>%</small></div>
+          <div class="delta gap">▼ 落后行业 0.55pp</div>
         </div>
       </div>
       <div class="chart-box"><canvas id="jdBar"></canvas></div>
@@ -193,11 +198,86 @@
         </div>
         <div class="kpi">
           <div class="label">优化前转化率</div>
-          <div class="value">1.86<small>%</small></div>
-          <div class="delta gap">▼ 落后行业 0.34pp</div>
+          <div class="value">1.72<small>%</small></div>
+          <div class="delta gap">▼ 落后行业 0.48pp</div>
         </div>
       </div>
       <div class="chart-box"><canvas id="webBar"></canvas></div>
+      <div class="legend">
+        <span><i style="background:var(--gray)"></i>优化前</span>
+        <span><i style="background:var(--amber)"></i>行业参考</span>
+      </div>
+    </div>
+
+    <!-- 天猫 -->
+    <div class="card">
+      <div class="card-head">
+        <h2><span class="tag" style="background:var(--tmall)"></span>天猫 Tmall</h2>
+        <span class="note">主图点击率 / 转化率</span>
+      </div>
+      <div class="kpis">
+        <div class="kpi">
+          <div class="label">优化前主图点击率</div>
+          <div class="value">2.48<small>%</small></div>
+          <div class="delta near">≈ 接近行业 2.50%</div>
+        </div>
+        <div class="kpi">
+          <div class="label">优化前转化率</div>
+          <div class="value">1.02<small>%</small></div>
+          <div class="delta ahead">▲ 高于行业 0.02pp</div>
+        </div>
+      </div>
+      <div class="chart-box"><canvas id="tmBar"></canvas></div>
+      <div class="legend">
+        <span><i style="background:var(--gray)"></i>优化前</span>
+        <span><i style="background:var(--amber)"></i>行业参考</span>
+      </div>
+    </div>
+
+    <!-- 拼多多 -->
+    <div class="card">
+      <div class="card-head">
+        <h2><span class="tag" style="background:var(--pdd)"></span>拼多多 Pinduoduo</h2>
+        <span class="note">主图点击率 / 转化率</span>
+      </div>
+      <div class="kpis">
+        <div class="kpi">
+          <div class="label">优化前主图点击率</div>
+          <div class="value">2.78<small>%</small></div>
+          <div class="delta ahead">▲ 高于行业 0.03pp</div>
+        </div>
+        <div class="kpi">
+          <div class="label">优化前转化率</div>
+          <div class="value">1.28<small>%</small></div>
+          <div class="delta near">≈ 接近行业 1.30%</div>
+        </div>
+      </div>
+      <div class="chart-box"><canvas id="pddBar"></canvas></div>
+      <div class="legend">
+        <span><i style="background:var(--gray)"></i>优化前</span>
+        <span><i style="background:var(--amber)"></i>行业参考</span>
+      </div>
+    </div>
+
+    <!-- 快手 -->
+    <div class="card">
+      <div class="card-head">
+        <h2><span class="tag" style="background:var(--ks)"></span>快手 Kuaishou</h2>
+        <span class="note">完播率 / 转化率</span>
+      </div>
+      <div class="kpis">
+        <div class="kpi">
+          <div class="label">优化前完播率</div>
+          <div class="value">24.50<small>%</small></div>
+          <div class="delta near">≈ 接近行业 25%</div>
+        </div>
+        <div class="kpi">
+          <div class="label">优化前转化率</div>
+          <div class="value">0.51<small>%</small></div>
+          <div class="delta ahead">▲ 高于行业 0.01pp</div>
+        </div>
+      </div>
+      <div class="chart-box"><canvas id="ksBar"></canvas></div>
       <div class="legend">
         <span><i style="background:var(--gray)"></i>优化前</span>
         <span><i style="background:var(--amber)"></i>行业参考</span>
@@ -217,21 +297,12 @@
 
   // 数据（优化前 / 行业参考）
   const channels = {
-    jd: {
-      labels: ['主图点击率', '转化率'],
-      before: [1.83, 2.01],
-      reference: [2.20, 2.50]
-    },
-    dy: {
-      labels: ['完播率', '转化率'],
-      before: [21, 0.40],
-      reference: [25, 0.50]
-    },
-    web: {
-      labels: ['站外进店率', '转化率'],
-      before: [18, 1.86],
-      reference: [23, 2.20]
-    }
+    jd:  { labels: ['主图点击率', '转化率'],     before: [1.83, 1.95],  reference: [2.12, 2.50], yMax: 3 },
+    dy:  { labels: ['完播率', '转化率'],         before: [21, 0.40],    reference: [25, 0.50],   yMax: 28 },
+    web: { labels: ['站外进店率', '转化率'],     before: [18, 1.72],    reference: [23, 2.20],   yMax: 26 },
+    tm:  { labels: ['主图点击率', '转化率'],     before: [2.48, 1.02],  reference: [2.50, 1.00], yMax: 3 },
+    pdd: { labels: ['主图点击率', '转化率'],     before: [2.78, 1.28],  reference: [2.75, 1.30], yMax: 3 },
+    ks:  { labels: ['完播率', '转化率'],         before: [24.50, 0.51], reference: [25, 0.50],   yMax: 28 }
   };
 
   // 存储每个图表的目标值，动画用 tween，tooltip 显示真实值
@@ -275,7 +346,7 @@
     return g;
   };
 
-  function buildBar(id, key, yMax) {
+  function buildBar(id, key) {
     const d = channels[key];
     const ctx = document.getElementById(id).getContext('2d');
     trueValues[id] = [d.before, d.reference];
@@ -288,16 +359,19 @@
           { label: '行业参考', data: [...d.reference], backgroundColor: makeBar(ctx, '#f59e0b'), borderRadius: 6 }
         ]
       },
-      options: barOpts(yMax)
+      options: barOpts(d.yMax)
     });
     chart._target = [d.before, d.reference]; // 驱动动画用
     return chart;
   }
 
   const charts = [
-    buildBar('jdBar', 'jd', 3),
-    buildBar('dyBar', 'dy', 28),
-    buildBar('webBar', 'web', 26)
+    buildBar('jdBar', 'jd'),
+    buildBar('dyBar', 'dy'),
+    buildBar('webBar', 'web'),
+    buildBar('tmBar', 'tm'),
+    buildBar('pddBar', 'pdd'),
+    buildBar('ksBar', 'ks')
   ];
 
   // ========= 循环动态：柱子温和起伏，满帧流畅、无限循环 =========
@@ -311,7 +385,7 @@
   function loop(t) {
     const elapsed = t - startT;
     charts.forEach((chart, ci) => {
-      const progress = ((elapsed + ci * 600) % CYCLE) / CYCLE;
+      const progress = ((elapsed + ci * 500) % CYCLE) / CYCLE;
       const p = sway(progress);
       const target = chart._target;
       chart.data.datasets.forEach((ds, di) => {
