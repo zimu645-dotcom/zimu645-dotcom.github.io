@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>zimu645-dotcom · 数据看板</title>
-<meta name="description" content="zimu645-dotcom 电商数据可视化大屏合集 — TikTok 直播 / 运营优化前后对比。">
+<title>AB家纺运营数据实时分析看板</title>
+<meta name="description" content="AB家纺运营数据实时分析看板 — 多平台运营与直播数据动态可视化大屏合集，TikTok 直播 / 运营优化前后对比。">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -34,8 +34,8 @@
   .hero .sub { margin-top: 14px; color: #94a3b8; font-size: 16px; }
 
   /* ---------- 轮播：左右按钮切换模块 ---------- */
-  .carousel { position: relative; padding: 6px 0 22px; overflow-x: clip; }
-  .stage { position: relative; min-height: 332px; }
+  .carousel { padding: 6px 0 26px; overflow-x: clip; }   /* 故意不设 position：让内部按钮以 .stage 为定位基准 */
+  .stage { position: relative; min-height: 0; }
   .card {
     position: absolute; left: 50%; top: 6px; width: 100%;
     --px: 58px;                      /* 左右内边距 = 给悬浮按钮留出的安全区 */
@@ -71,9 +71,10 @@
   .card .go { margin-top: 22px; font-size: 14px; color: var(--c); font-weight: 600; }
   .card .go::after { content: ' →'; }
 
-  /* 左右箭头 */
+  /* 左右箭头：内嵌于当前模块卡片内。--ch 为卡片实测高度（JS 写入），保证任何高度下都与卡片垂直居中、且不越界 */
   .nav {
-    position: absolute; top: 50%; transform: translateY(-50%); z-index: 5;
+    position: absolute; z-index: 5; top: 6px;
+    top: calc(6px + (var(--ch, 248px) - 50px) / 2);
     width: 50px; height: 50px; border-radius: 50%; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     color: #e5e7eb; background: rgba(15, 23, 42, .78);
@@ -105,8 +106,16 @@
   .hint { text-align: center; margin-top: 8px; font-size: 12px; color: #475569; }
 
   @media (max-width: 620px) {
-    /* 窄屏改为按钮贴卡片底部，内容用完整宽度，避免文字被挤成窄条 */
-    .nav { width: 38px; height: 38px; font-size: 18px; top: auto; bottom: 12px; transform: none; }
+    .hero { padding: 70px 0 26px; }
+    .hero .badge { font-size: 10px; letter-spacing: 1.2px; padding: 4px 12px; }
+    .hero h1 { font-size: clamp(24px, 7.2vw, 32px); }
+    .hero .sub { font-size: 14px; margin-top: 10px; }
+    /* 窄屏：按钮贴卡片底部两角（内容已用完整宽度，不会与文字重叠） */
+    .nav {
+      width: 38px; height: 38px; font-size: 18px;
+      top: calc(6px + var(--ch, 300px) - 38px - 17px);   /* 距卡片底部 17px */
+      transform: none;
+    }
     .nav:hover { transform: scale(1.07); }
     .nav:active { transform: scale(.94); }
     .nav.prev { left: 18px; }
@@ -123,9 +132,9 @@
 <body>
 <div class="wrap">
   <section class="hero">
-    <div class="badge">DATA DASHBOARDS</div>
-    <h1>电商运营数据看板</h1>
-    <p class="sub">多平台运营 / 直播数据 · 动态可视化大屏合集</p>
+    <div class="badge">AB FAMILY TEXTILE · REAL-TIME ANALYTICS</div>
+    <h1>AB家纺运营数据实时分析看板</h1>
+    <p class="sub">多平台运营 / 直播数据 · 实时动态可视化大屏合集</p>
   </section>
 
   <div class="carousel" id="carousel" role="region" aria-roledescription="轮播" aria-label="数据看板模块">
@@ -148,12 +157,10 @@
         <p>三渠道优化前现状 vs 行业参考，落后差距一目了然 · 动态柱状对比</p>
         <div class="go">进入看板</div>
       </a>
+      <button class="nav prev" id="prev" type="button" aria-label="上一个模块">‹</button>
+      <button class="nav next" id="next" type="button" aria-label="下一个模块">›</button>
     </div>
-
-    <button class="nav prev" id="prev" type="button" aria-label="上一个模块">‹</button>
-    <button class="nav next" id="next" type="button" aria-label="下一个模块">›</button>
   </div>
-
   <div class="dots" id="dots" role="tablist" aria-label="模块切换"></div>
   <div class="counter" id="counter" aria-live="polite"></div>
   <div class="hint">点击左右按钮切换 · 支持键盘 ← → · 手机可左右滑动</div>
@@ -270,6 +277,8 @@
     if (h > 0 && h < 1200 && Math.round(h) !== stageH) {
       stageH = Math.round(h);
       stage.style.height = (stageH + 6) + 'px';   // +6 = 卡片 top 偏移，避免溢出裁切
+      // --ch = 卡片实测高度：左右按钮据此与卡片垂直居中（窄屏据此贴底），任何高度下都不越界
+      stage.style.setProperty('--ch', stageH + 'px');
     }
   }
   function scheduleFit() {
