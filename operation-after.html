@@ -140,19 +140,19 @@
       <div class="kpis">
         <div class="kpi">
           <div class="label">优化后主图点击率</div>
-          <div class="value">2.60<small>%</small></div>
-          <div class="delta up">▲ 0.77pp · 增长 42.08%</div>
+          <div class="value">5.60<small>%</small></div>
+          <div class="delta up">▲ 1.10pp · 增长 24.44%</div>
         </div>
         <div class="kpi">
           <div class="label">优化后转化率</div>
-          <div class="value">2.60<small>%</small></div>
-          <div class="delta up">▲ 0.65pp · 增长 33.33%</div>
+          <div class="value">5.46<small>%</small></div>
+          <div class="delta up">▲ 0.91pp · 增长 20.00%</div>
         </div>
       </div>
       <div class="chart-box"><canvas id="jdBar"></canvas></div>
       <div class="legend">
         <span><i style="background:var(--gray)"></i>优化前</span>
-        <span><i style="background:var(--amber)"></i>行业参考</span>
+        <span><i style="background:var(--amber)"></i>行业平均值</span>
         <span><i style="background:var(--green)"></i>优化后</span>
       </div>
     </div>
@@ -166,19 +166,19 @@
       <div class="kpis">
         <div class="kpi">
           <div class="label">优化后完播率</div>
-          <div class="value">29<small>%</small></div>
-          <div class="delta up">▲ 8pp · 增长 38.10%</div>
+          <div class="value">17.66<small>%</small></div>
+          <div class="delta up">▲ 4.86pp · 增长 37.97%</div>
         </div>
         <div class="kpi">
           <div class="label">优化后转化率</div>
-          <div class="value">0.53<small>%</small></div>
-          <div class="delta up">▲ 0.13pp · 增长 32.50%</div>
+          <div class="value">1.10<small>%</small></div>
+          <div class="delta up">▲ 0.30pp · 增长 37.50%</div>
         </div>
       </div>
       <div class="chart-box"><canvas id="dyBar"></canvas></div>
       <div class="legend">
         <span><i style="background:var(--gray)"></i>优化前</span>
-        <span><i style="background:var(--amber)"></i>行业参考</span>
+        <span><i style="background:var(--amber)"></i>行业平均值</span>
         <span><i style="background:var(--green)"></i>优化后</span>
       </div>
     </div>
@@ -192,19 +192,19 @@
       <div class="kpis">
         <div class="kpi">
           <div class="label">优化后站外进店率</div>
-          <div class="value">24.80<small>%</small></div>
-          <div class="delta up">▲ 6.80pp · 增长 37.78%</div>
+          <div class="value">3.03<small>%</small></div>
+          <div class="delta up">▲ 1.00pp · 增长 49.26%</div>
         </div>
         <div class="kpi">
           <div class="label">优化后转化率</div>
-          <div class="value">2.28<small>%</small></div>
-          <div class="delta up">▲ 0.56pp · 增长 32.56%</div>
+          <div class="value">3.03<small>%</small></div>
+          <div class="delta up">▲ 1.07pp · 增长 54.59%</div>
         </div>
       </div>
       <div class="chart-box"><canvas id="webBar"></canvas></div>
       <div class="legend">
         <span><i style="background:var(--gray)"></i>优化前</span>
-        <span><i style="background:var(--amber)"></i>行业参考</span>
+        <span><i style="background:var(--amber)"></i>行业平均值</span>
         <span><i style="background:var(--green)"></i>优化后</span>
       </div>
     </div>
@@ -224,21 +224,21 @@
   const channels = {
     jd: {
       labels: ['主图点击率', '转化率'],
-      before: [1.83, 1.95],
-      reference: [2.12, 2.50],
-      after: [2.60, 2.60]
+      before: [4.50, 4.55],
+      reference: [5, 5],
+      after: [5.60, 5.46]
     },
     dy: {
       labels: ['完播率', '转化率'],
-      before: [21, 0.40],
-      reference: [25, 0.50],
-      after: [29, 0.53]
+      before: [12.80, 0.80],
+      reference: [16, 0.98],
+      after: [17.66, 1.10]
     },
     web: {
       labels: ['站外进店率', '转化率'],
-      before: [18, 1.72],
-      reference: [23, 2.20],
-      after: [24.80, 2.28]
+      before: [2.03, 1.96],
+      reference: [2.70, 2.80],
+      after: [3.03, 3.03]
     }
   };
 
@@ -293,7 +293,7 @@
         labels: d.labels,
         datasets: [
           { label: '优化前', data: [...d.before], backgroundColor: 'rgba(100,116,139,0.75)', borderRadius: 6 },
-          { label: '行业参考', data: [...d.reference], backgroundColor: 'rgba(245,158,11,0.8)', borderRadius: 6 },
+          { label: '行业平均值', data: [...d.reference], backgroundColor: 'rgba(245,158,11,0.8)', borderRadius: 6 },
           { label: '优化后', data: [...d.after], backgroundColor: makeBar(ctx, '#22c55e'), borderRadius: 6 }
         ]
       },
