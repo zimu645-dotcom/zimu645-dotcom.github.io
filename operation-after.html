@@ -202,9 +202,9 @@
         </div>
         <div class="kpi">
           <div class="label">优化后转化率</div>
-          <div class="value">3.03<small>%</small></div>
+          <div class="value">3.20<small>%</small></div>
           <div class="delta">行业平均值 2.80%</div>
-          <div class="delta up">▲ 1.07pp · 增长 54.59%</div>
+          <div class="delta up">▲ 1.24pp · 增长 63.27%</div>
         </div>
       </div>
       <div class="chart-box"><canvas id="webBar"></canvas></div>
@@ -244,7 +244,7 @@
       labels: ['站外进店率', '转化率'],
       before: [2.03, 1.96],
       reference: [2.70, 2.80],
-      after: [3.03, 3.03]
+      after: [3.03, 3.20]
     }
   };
 
@@ -312,7 +312,7 @@
   const charts = [
     buildBar('jdBar', 'jd', 6),
     buildBar('dyBar', 'dy', 20),
-    buildBar('webBar', 'web', 4)
+    buildBar('webBar', 'web', 5)
   ];
 
   // ========= 循环动态：柱子温和起伏，满帧流畅、无限循环 =========
