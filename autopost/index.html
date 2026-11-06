@@ -112,7 +112,7 @@
 </div>
 
 <script>
-const API = "https://beyond-tail-publicly-makes.trycloudflare.com";
+const API = location.hostname.endsWith("github.io") ? "https://beyond-tail-publicly-makes.trycloudflare.com" : "";
 const REDIRECT = location.origin + location.pathname.replace(/index\.html$/, "") + "callback.html";
 const SCOPES = "user.info.basic,video.upload";
 const CLIENT_KEY = "sbawc1faijig9lsy51";
@@ -257,14 +257,30 @@ $("btnDisc").onclick = async () => {
 };
 
 $("drop").onclick = () => $("file").click();
-$("file").onchange = async (e) => {
+$("file").onchange = (e) => {
   const f = e.target.files[0]; if (!f) return;
-  $("fileInfo").textContent = t("uploading") + " " + f.name + " (" + (f.size / 1048576).toFixed(1) + " MB)…";
-  const r = await fetch(API + "/api/file?name=" + encodeURIComponent(f.name), { method: "POST", body: f });
-  const j = await r.json();
-  fileId = j.file_id;
-  $("fileInfo").textContent = t("ready") + f.name + " (" + (f.size / 1048576).toFixed(1) + " MB)";
-  $("s2").classList.add("done");
+  const mb = (f.size / 1048576).toFixed(1);
+  $("fileInfo").textContent = t("uploading") + " " + f.name + " (" + mb + " MB) — 0%";
+  const xhr = new XMLHttpRequest();
+  xhr.open("POST", API + "/api/file?name=" + encodeURIComponent(f.name));
+  xhr.onprogress = () => {};
+  xhr.upload.onprogress = (ev) => {
+    if (ev.lengthComputable) {
+      const pct = Math.floor((ev.loaded / ev.total) * 100);
+      $("fileInfo").textContent = t("uploading") + " " + f.name + " — " + pct + "%  (" + (ev.loaded / 1048576).toFixed(1) + " / " + mb + " MB)";
+    }
+  };
+  xhr.onload = () => {
+    try {
+      const j = JSON.parse(xhr.responseText);
+      if (!j.file_id) { $("fileInfo").textContent = t("err") + xhr.responseText.slice(0, 160); return; }
+      fileId = j.file_id;
+      $("fileInfo").textContent = t("ready") + f.name + " (" + mb + " MB)";
+      $("s2").classList.add("done");
+    } catch (err) { $("fileInfo").textContent = t("err") + xhr.responseText.slice(0, 160); }
+  };
+  xhr.onerror = () => { $("fileInfo").textContent = t("err") + "network / CORS"; };
+  xhr.send(f);
 };
 
 $("btnSend").onclick = async () => {

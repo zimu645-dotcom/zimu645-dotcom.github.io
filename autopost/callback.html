@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8"><meta name="google" content="notranslate"><meta name="robots" content="noindex">
@@ -32,7 +32,7 @@ document.getElementById("h").textContent = TXT.h;
 document.getElementById("p").textContent = TXT.p;
 document.getElementById("back").textContent = TXT.back;
 
-const API = "https://beyond-tail-publicly-makes.trycloudflare.com";
+const API = location.hostname.endsWith("github.io") ? "https://beyond-tail-publicly-makes.trycloudflare.com" : "";
 (async () => {
   const q = new URLSearchParams(location.search);
   const code = q.get("code");
