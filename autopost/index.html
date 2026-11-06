@@ -238,6 +238,7 @@ $("langZh").onclick = () => { lang = "zh"; localStorage.setItem("ap_lang", "zh")
 $("langEn").onclick = () => { lang = "en"; localStorage.setItem("ap_lang", "en"); applyLang(); };
 
 $("btnConnect").onclick = async () => {
+  try { await fetch(API + "/api/intent", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ return_url: location.origin + location.pathname }) }); } catch (e) {}
   const { verifier, challenge } = await makePKCE();
   localStorage.setItem("tt_verifier", verifier);
   const u = new URL("https://www.tiktok.com/v2/auth/authorize/");
