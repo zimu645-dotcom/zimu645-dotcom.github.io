@@ -1,19 +1,59 @@
-﻿<!doctype html>
-<html lang="en">
+<!doctype html>
+<html lang="zh-CN">
 <head>
 <meta charset="utf-8"><meta name="google" content="notranslate"><meta name="robots" content="noindex">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Privacy Policy — AutoPost Studio</title>
+<title>隐私政策 — AutoPost Studio</title>
 <style>
- body{background:#0b0b0f;color:#e8e8ee;font:15px/1.75 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC",sans-serif;margin:0}
- .wrap{max-width:760px;margin:0 auto;padding:48px 22px 90px}
- h1{font-size:25px}h2{font-size:17px;margin-top:30px;color:#fff}
+ body{background:#0b0b0f;color:#e8e8ee;font:15px/1.8 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;margin:0}
+ .wrap{max-width:760px;margin:0 auto;padding:44px 22px 90px}
+ h1{font-size:24px}h2{font-size:17px;margin-top:28px;color:#fff}
  a{color:#25f4ee}.mut{color:#9a9aab;font-size:13px}
  code{background:#15151c;padding:2px 6px;border-radius:5px;border:1px solid #26262f}
  li{margin:6px 0}
+ .lang{display:flex;gap:6px;background:#15151c;border:1px solid #26262f;border-radius:99px;padding:4px;width:max-content;margin-bottom:22px}
+ .lang button{background:transparent;color:#9a9aab;border:0;border-radius:99px;padding:4px 12px;font-size:12px;font-weight:600;cursor:pointer}
+ .lang button.on{background:#26262f;color:#fff}
+ .hide{display:none}
 </style>
 </head>
 <body><div class="wrap">
+<div class="lang"><button id="bz">中文</button><button id="be">EN</button></div>
+
+<div id="zh">
+<h1>隐私政策 — AutoPost Studio</h1>
+<p class="mut">最后更新：2026-11-06</p>
+
+<h2>1. 我们收集哪些数据</h2>
+<ul>
+  <li id="i1">TikTok 的 <b>open_id</b>（账号在接口里的唯一标识）与昵称，通过 Login Kit 的 <code>user.info.basic</code> 权限获取。</li>
+  <li>TikTok 的 <b>access_token</b> 与 <b>refresh_token</b>，加密保存在服务器上，仅用于代表你调用 Content Posting API。</li>
+  <li><b>publish_id</b> 与发布状态的日志，用于向你显示你自己那几次上传的结果。</li>
+  <li>你选择的视频文件，仅在传输过程中临时保存。</li>
+</ul>
+
+<h2>2. 我们不收集什么</h2>
+<p>不收集你的 TikTok 密码，不收集你的粉丝数据、私信内容，也不收集其他用户的任何数据。我们不用 Cookie 做广告，
+不向任何第三方出售数据。</p>
+
+<h2>3. 数据怎么用</h2>
+<p>只用于：识别你的账号、把你选的文件传到 TikTok、向你显示这次传输的结果。</p>
+
+<h2>4. 保存多久</h2>
+<p>视频文件传给 TikTok 后，24 小时内从服务器删除。令牌保留到你断开连接为止。发布日志保留 90 天。</p>
+
+<h2>5. 对外提供</h2>
+<p>数据只发往 TikTok 官方接口。不向广告商或其他第三方提供。</p>
+
+<h2>6. 你的权利</h2>
+<p>你可以随时在 TikTok「设置 → 安全与权限 → 管理应用权限」中撤销授权，或在本站点击「断开连接」。你也可以发邮件
+要求删除全部已存数据，我们会在 7 天内完成删除。</p>
+
+<h2>7. 联系方式</h2>
+<p>zimu645@gmail.com</p>
+</div>
+
+<div id="en" class="hide">
 <h1>Privacy Policy — AutoPost Studio</h1>
 <p class="mut">Last updated: 2026-11-06</p>
 
@@ -47,7 +87,24 @@ completed within 7 days.</p>
 
 <h2>7. Contact</h2>
 <p>zimu645@gmail.com</p>
+</div>
 
-<p class="mut" style="margin-top:36px"><a href="./">← Back to AutoPost Studio</a> · <a href="./terms.html">Terms of Service</a></p>
-</div></body>
+<p class="mut" style="margin-top:36px"><a href="./" id="back">← 返回 AutoPost Studio</a> · <a href="./terms.html">服务条款</a></p>
+</div>
+<script>
+const zh = (navigator.language || "").toLowerCase().startsWith("zh");
+function show(l) {
+  document.getElementById("zh").classList.toggle("hide", l !== "zh");
+  document.getElementById("en").classList.toggle("hide", l !== "en");
+  document.getElementById("bz").classList.toggle("on", l === "zh");
+  document.getElementById("be").classList.toggle("on", l === "en");
+  document.getElementById("back").textContent = l === "zh" ? "← 返回 AutoPost Studio" : "← Back to AutoPost Studio";
+  document.title = l === "zh" ? "隐私政策 — AutoPost Studio" : "Privacy Policy — AutoPost Studio";
+  document.documentElement.lang = l === "zh" ? "zh-CN" : "en";
+}
+document.getElementById("bz").onclick = () => show("zh");
+document.getElementById("be").onclick = () => show("en");
+show(zh ? "zh" : "en");
+</script>
+</body>
 </html>

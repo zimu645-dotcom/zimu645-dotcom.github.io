@@ -1,20 +1,23 @@
-﻿<!doctype html>
-<html lang="en">
+<!doctype html>
+<html lang="zh-CN">
 <head>
 <meta charset="utf-8"><meta name="google" content="notranslate"><meta name="robots" content="noindex">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AutoPost Studio — Publish your videos to TikTok</title>
-<meta name="description" content="AutoPost Studio lets a creator connect their own TikTok account and publish videos they have already produced.">
+<title data-i18n="title">AutoPost Studio —— 把视频发布到你的 TikTok 账号</title>
+<meta name="description" content="AutoPost Studio 帮你把自己做好的视频发布到自己的 TikTok 账号。">
 <meta name="tiktok-developers-site-verification" content="ubFk61KVLqSEmR5pw3ZHHC09Zys8OD0h">
 <style>
   :root{--bg:#0b0b0f;--card:#15151c;--line:#26262f;--txt:#f4f4f7;--mut:#9a9aab;--pink:#fe2c55;--cyan:#25f4ee}
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif}
-  .wrap{max-width:820px;margin:0 auto;padding:44px 22px 90px}
-  header{display:flex;align-items:center;gap:14px;margin-bottom:30px}
+  .wrap{max-width:820px;margin:0 auto;padding:40px 22px 90px}
+  header{display:flex;align-items:center;gap:14px;margin-bottom:28px}
   .logo{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#fe2c55,#25f4ee);display:grid;place-items:center;font-weight:800;color:#0b0b0f;font-size:15px}
   h1{font-size:21px;margin:0}
   .sub{color:var(--mut);font-size:13px}
+  .lang{margin-left:auto;display:flex;gap:6px;background:#15151c;border:1px solid var(--line);border-radius:99px;padding:4px}
+  .lang button{background:transparent;color:var(--mut);border:0;border-radius:99px;padding:4px 12px;font-size:12px;font-weight:600;cursor:pointer}
+  .lang button.on{background:#26262f;color:#fff}
   .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin-bottom:16px}
   .step{display:flex;gap:14px;align-items:flex-start}
   .num{flex:0 0 28px;height:28px;border-radius:50%;background:#22222c;color:var(--mut);display:grid;place-items:center;font-size:12px;font-weight:700}
@@ -38,7 +41,7 @@
   .foot{color:var(--mut);font-size:12px;text-align:center;margin-top:30px}
   a{color:var(--cyan)}
   .hide{display:none}
-  .pill{font-size:11px;padding:3px 9px;border-radius:99px;background:#22222c;color:var(--mut);margin-left:8px}
+  .tip{font-size:12px;color:var(--mut);margin-top:10px;padding:10px 12px;border-left:2px solid var(--cyan);background:#101018;border-radius:0 8px 8px 0}
 </style>
 </head>
 <body>
@@ -47,26 +50,31 @@
     <div class="logo">AP</div>
     <div>
       <h1>AutoPost Studio</h1>
-      <div class="sub">Publish the videos you already produced to your own TikTok account</div>
+      <div class="sub" data-i18n="tagline">把你已经做好的视频，发布到你自己的 TikTok 账号</div>
+    </div>
+    <div class="lang">
+      <button id="langZh">中文</button>
+      <button id="langEn">EN</button>
     </div>
   </header>
 
   <div class="card" id="s1">
     <div class="step"><div class="num"><span>1</span></div><div style="flex:1">
-      <b>Connect your TikTok account</b>
-      <div class="sub" id="conn">Not connected</div>
+      <b data-i18n="s1title">连接你的 TikTok 账号</b>
+      <div class="sub" id="conn" data-i18n="notConnected">未连接</div>
       <div class="row">
-        <button class="primary" id="btnConnect">Connect TikTok</button>
-        <button class="ghost hide" id="btnDisc">Disconnect</button>
+        <button class="primary" id="btnConnect" data-i18n="connect">连接 TikTok</button>
+        <button class="ghost hide" id="btnDisc" data-i18n="disconnect">断开连接</button>
       </div>
+      <div class="tip" data-i18n="s1tip">点按钮会跳转到 TikTok 官方授权页，授权后自动回到这里。我们拿不到你的密码。</div>
     </div></div>
   </div>
 
   <div class="card" id="s2">
     <div class="step"><div class="num"><span>2</span></div><div style="flex:1">
-      <b>Choose a video</b>
-      <div class="sub">MP4 / H.264 · up to 4 GB · the file stays on your machine until you publish</div>
-      <div id="drop">Click to select the video file you already produced</div>
+      <b data-i18n="s2title">选择视频</b>
+      <div class="sub" data-i18n="s2sub">MP4 / H.264 · 最大 4 GB · 在发送之前文件只留在你电脑上</div>
+      <div id="drop" data-i18n="s2drop">点击选择你已经做好的视频文件</div>
       <input type="file" id="file" accept="video/mp4,video/quicktime" class="hide">
       <div class="sub" id="fileInfo" style="margin-top:10px"></div>
     </div></div>
@@ -74,28 +82,32 @@
 
   <div class="card" id="s3">
     <div class="step"><div class="num"><span>3</span></div><div style="flex:1">
-      <b>Caption</b>
-      <label>Caption / hashtags</label>
+      <b data-i18n="s3title">填写标题</b>
+      <label data-i18n="s3label">标题 / 话题（#标签）</label>
       <textarea id="title">My first AutoPost video #demo</textarea>
-      <label>Cover frame (ms)</label>
+      <label data-i18n="s3cover">封面取第几毫秒的画面</label>
       <input type="text" id="cover" value="1000">
     </div></div>
   </div>
 
   <div class="card" id="s4">
     <div class="step"><div class="num"><span>4</span></div><div style="flex:1">
-      <b>Send to TikTok</b>
-      <div class="sub">The Content Posting API is called only after you click this button.</div>
+      <b data-i18n="s4title">发送到 TikTok</b>
+      <div class="sub" data-i18n="s4sub">只有你点下面这个按钮时，才会调用 TikTok 官方接口。</div>
       <div class="row">
-        <button class="primary" id="btnSend">Send to TikTok inbox (draft)</button>
+        <button class="primary" id="btnSend" data-i18n="send">发送到 TikTok 收件箱（草稿）</button>
       </div>
       <div class="bar"><i id="prog"></i></div>
       <pre id="log" class="hide"></pre>
+      <div class="tip" data-i18n="s4tip">发完之后，手机 TikTok 会收到一条通知，点开确认才会真正公开。这是 TikTok 对未审核应用的规定。</div>
     </div></div>
   </div>
 
   <div class="foot">
-    By publishing you agree to our <a href="./terms.html">Terms of Service</a> and <a href="./privacy.html">Privacy Policy</a>.
+    <span data-i18n="foot">发送即表示你同意</span>
+    <a href="./terms.html" data-i18n="terms">服务条款</a>
+    <span data-i18n="and">与</span>
+    <a href="./privacy.html" data-i18n="privacy">隐私政策</a>
   </div>
 </div>
 
@@ -105,9 +117,92 @@ const REDIRECT = location.origin + location.pathname.replace(/index\.html$/, "")
 const SCOPES = "user.info.basic,video.upload";
 const CLIENT_KEY = "sbawc1faijig9lsy51";
 
+const I18N = {
+  zh: {
+    title: "AutoPost Studio —— 把视频发布到你的 TikTok 账号",
+    tagline: "把你已经做好的视频，发布到你自己的 TikTok 账号",
+    s1title: "连接你的 TikTok 账号",
+    notConnected: "未连接",
+    connect: "连接 TikTok",
+    disconnect: "断开连接",
+    s1tip: "点按钮会跳转到 TikTok 官方授权页，授权后自动回到这里。我们拿不到你的密码。",
+    s2title: "选择视频",
+    s2sub: "MP4 / H.264 · 最大 4 GB · 在发送之前文件只留在你电脑上",
+    s2drop: "点击选择你已经做好的视频文件",
+    s3title: "填写标题",
+    s3label: "标题 / 话题（#标签）",
+    s3cover: "封面取第几毫秒的画面",
+    s4title: "发送到 TikTok",
+    s4sub: "只有你点下面这个按钮时，才会调用 TikTok 官方接口。",
+    send: "发送到 TikTok 收件箱（草稿）",
+    s4tip: "发完之后，手机 TikTok 会收到一条通知，点开确认才会真正公开。这是 TikTok 对未审核应用的规定。",
+    foot: "发送即表示你同意",
+    terms: "服务条款",
+    privacy: "隐私政策",
+    and: "与",
+    connected: "已连接：",
+    uploading: "正在上传",
+    ready: "已就绪：",
+    calling: "正在调用发送接口…",
+    pid: "任务编号 publish_id = ",
+    status: "状态：",
+    done: "完成，去手机 TikTok 收件箱确认",
+    err: "出错了：",
+    noFile: "请先选择一个视频",
+    reconn: "重新连接"
+  },
+  en: {
+    title: "AutoPost Studio — Publish your videos to TikTok",
+    tagline: "Publish the videos you already produced to your own TikTok account",
+    s1title: "Connect your TikTok account",
+    notConnected: "Not connected",
+    connect: "Connect TikTok",
+    disconnect: "Disconnect",
+    s1tip: "You will be redirected to TikTok's official authorization page and come straight back. We never see your password.",
+    s2title: "Choose a video",
+    s2sub: "MP4 / H.264 · up to 4 GB · the file stays on your machine until you publish",
+    s2drop: "Click to select the video file you already produced",
+    s3title: "Caption",
+    s3label: "Caption / hashtags",
+    s3cover: "Cover frame (ms)",
+    s4title: "Send to TikTok",
+    s4sub: "The Content Posting API is called only after you click this button.",
+    send: "Send to TikTok inbox (draft)",
+    s4tip: "After sending, the TikTok app receives a notification. The video becomes public only after you confirm there.",
+    foot: "By publishing you agree to our",
+    terms: "Terms of Service",
+    privacy: "Privacy Policy",
+    and: "and",
+    connected: "Connected as ",
+    uploading: "Uploading ",
+    ready: "Ready: ",
+    calling: "Calling the publish endpoint…",
+    pid: "publish_id = ",
+    status: "status: ",
+    done: "Done — confirm it in the TikTok app inbox",
+    err: "ERROR ",
+    noFile: "Choose a video first",
+    reconn: "Reconnect"
+  }
+};
+
+let lang = localStorage.getItem("ap_lang") || ((navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en");
+function t(k) { return (I18N[lang] || I18N.en)[k] || k; }
+function applyLang() {
+  document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    const k = el.getAttribute("data-i18n");
+    if (I18N[lang][k]) el.textContent = I18N[lang][k];
+  });
+  document.title = t("title");
+  $("langZh").classList.toggle("on", lang === "zh");
+  $("langEn").classList.toggle("on", lang === "en");
+  refresh();
+}
+
 const $ = (id) => document.getElementById(id);
 let fileId = null;
-function log(t) { const el = $("log"); el.classList.remove("hide"); el.textContent += t + "\n"; el.scrollTop = el.scrollHeight; }
+function log(msg) { const el = $("log"); el.classList.remove("hide"); el.textContent += msg + "\n"; el.scrollTop = el.scrollHeight; }
 
 function b64url(bytes) {
   return btoa(String.fromCharCode(...new Uint8Array(bytes))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
@@ -124,15 +219,23 @@ async function refresh() {
   try {
     const s = await (await fetch(API + "/api/state")).json();
     if (s.connected) {
-      $("conn").textContent = "Connected as @" + (s.username || s.open_id);
+      $("conn").textContent = t("connected") + (s.username || s.open_id);
       $("btnDisc").classList.remove("hide");
-      $("btnConnect").textContent = "Reconnect";
+      $("btnConnect").textContent = t("reconn");
       $("s1").classList.add("done");
     } else {
-      $("conn").textContent = "Not connected";
+      $("conn").textContent = t("notConnected");
+      $("btnDisc").classList.add("hide");
+      $("btnConnect").textContent = t("connect");
+      $("s1").classList.remove("done");
     }
-  } catch (e) { $("conn").textContent = "Backend unreachable: " + e.message; }
+  } catch (e) {
+    $("conn").textContent = t("notConnected") + " (" + e.message + ")";
+  }
 }
+
+$("langZh").onclick = () => { lang = "zh"; localStorage.setItem("ap_lang", "zh"); applyLang(); };
+$("langEn").onclick = () => { lang = "en"; localStorage.setItem("ap_lang", "en"); applyLang(); };
 
 $("btnConnect").onclick = async () => {
   const { verifier, challenge } = await makePKCE();
@@ -156,42 +259,43 @@ $("btnDisc").onclick = async () => {
 $("drop").onclick = () => $("file").click();
 $("file").onchange = async (e) => {
   const f = e.target.files[0]; if (!f) return;
-  $("fileInfo").textContent = "Uploading " + f.name + " (" + (f.size / 1048576).toFixed(1) + " MB)…";
+  $("fileInfo").textContent = t("uploading") + " " + f.name + " (" + (f.size / 1048576).toFixed(1) + " MB)…";
   const r = await fetch(API + "/api/file?name=" + encodeURIComponent(f.name), { method: "POST", body: f });
   const j = await r.json();
   fileId = j.file_id;
-  $("fileInfo").textContent = "Ready: " + f.name + " (" + (f.size / 1048576).toFixed(1) + " MB)";
+  $("fileInfo").textContent = t("ready") + f.name + " (" + (f.size / 1048576).toFixed(1) + " MB)";
   $("s2").classList.add("done");
 };
 
 $("btnSend").onclick = async () => {
-  if (!fileId) return alert("Choose a video first");
+  if (!fileId) return alert(t("noFile"));
   $("btnSend").disabled = true;
-  log("Calling /v2/post/publish/inbox/video/init/ …");
+  log(t("calling"));
   const r = await fetch(API + "/api/inbox", {
     method: "POST", headers: { "content-type": "application/json" },
     body: JSON.stringify({ file_id: fileId })
   });
   const j = await r.json();
-  if (j.error) { log("ERROR " + JSON.stringify(j.error)); $("btnSend").disabled = false; return; }
-  log("publish_id = " + j.publish_id);
+  if (j.error) { log(t("err") + JSON.stringify(j.error)); $("btnSend").disabled = false; return; }
+  log(t("pid") + j.publish_id);
   $("s3").classList.add("done");
   let p = 10;
   const timer = setInterval(async () => {
     const s = await (await fetch(API + "/api/status?id=" + encodeURIComponent(j.publish_id))).json();
     p = Math.min(97, p + 6);
     $("prog").style.width = p + "%";
-    log("status: " + (s.status || "PENDING") + (s.fail_reason ? " / " + s.fail_reason : ""));
+    log(t("status") + (s.status || "PENDING") + (s.fail_reason ? " / " + s.fail_reason : ""));
     if (["SEND_TO_USER_INBOX", "PUBLISH_COMPLETE", "FAILED"].includes(s.status)) {
       clearInterval(timer);
       $("prog").style.width = "100%";
       $("s4").classList.add("done");
       $("btnSend").disabled = false;
+      log(t("done"));
     }
   }, 3000);
 };
 
-refresh();
+applyLang();
 </script>
 </body>
 </html>
