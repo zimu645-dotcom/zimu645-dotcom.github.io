@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AutoPost Studio — Publish your videos to TikTok</title>
+<meta name="description" content="AutoPost Studio lets a creator connect their own TikTok account and publish videos they have already produced.">
+<meta name="tiktok-developers-site-verification" content="ubFk61KVLqSEmR5pw3ZHHC09Zys8OD0h">
+<style>
+  :root{--bg:#0b0b0f;--card:#15151c;--line:#26262f;--txt:#f4f4f7;--mut:#9a9aab;--pink:#fe2c55;--cyan:#25f4ee}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif}
+  .wrap{max-width:820px;margin:0 auto;padding:44px 22px 90px}
+  header{display:flex;align-items:center;gap:14px;margin-bottom:30px}
+  .logo{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#fe2c55,#25f4ee);display:grid;place-items:center;font-weight:800;color:#0b0b0f;font-size:15px}
+  h1{font-size:21px;margin:0}
+  .sub{color:var(--mut);font-size:13px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin-bottom:16px}
+  .step{display:flex;gap:14px;align-items:flex-start}
+  .num{flex:0 0 28px;height:28px;border-radius:50%;background:#22222c;color:var(--mut);display:grid;place-items:center;font-size:12px;font-weight:700}
+  .step.done .num{background:var(--cyan);color:#0b0b0f}
+  .step.done .num::after{content:"✓"}
+  .step.done .num span{display:none}
+  b{font-size:15px}
+  label{display:block;font-size:12px;color:var(--mut);margin:14px 0 6px;letter-spacing:.3px}
+  input[type=text],textarea,select{width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:#0d0d13;color:var(--txt);font-size:14px;font-family:inherit}
+  textarea{min-height:70px;resize:vertical}
+  button{cursor:pointer;border:0;border-radius:10px;padding:12px 20px;font-size:14px;font-weight:600;font-family:inherit}
+  .primary{background:var(--pink);color:#fff}
+  .ghost{background:#22222c;color:var(--txt);border:1px solid var(--line)}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:14px}
+  #drop{border:1px dashed var(--line);border-radius:12px;padding:26px;text-align:center;color:var(--mut);cursor:pointer;margin-top:12px}
+  #drop:hover{border-color:var(--cyan);color:var(--cyan)}
+  .bar{height:8px;border-radius:99px;background:#22222c;overflow:hidden;margin-top:14px}
+  .bar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,#fe2c55,#25f4ee);transition:width .3s}
+  pre{background:#0d0d13;border:1px solid var(--line);border-radius:10px;padding:12px;font-size:12px;color:#b9b9c8;overflow:auto;max-height:220px}
+  .foot{color:var(--mut);font-size:12px;text-align:center;margin-top:30px}
+  a{color:var(--cyan)}
+  .hide{display:none}
+  .pill{font-size:11px;padding:3px 9px;border-radius:99px;background:#22222c;color:var(--mut);margin-left:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">AP</div>
+    <div>
+      <h1>AutoPost Studio</h1>
+      <div class="sub">Publish the videos you already produced to your own TikTok account</div>
+    </div>
+  </header>
+
+  <div class="card" id="s1">
+    <div class="step"><div class="num"><span>1</span></div><div style="flex:1">
+      <b>Connect your TikTok account</b>
+      <div class="sub" id="conn">Not connected</div>
+      <div class="row">
+        <button class="primary" id="btnConnect">Connect TikTok</button>
+        <button class="ghost hide" id="btnDisc">Disconnect</button>
+      </div>
+    </div></div>
+  </div>
+
+  <div class="card" id="s2">
+    <div class="step"><div class="num"><span>2</span></div><div style="flex:1">
+      <b>Choose a video</b>
+      <div class="sub">MP4 / H.264 · up to 4 GB · the file stays on your machine until you publish</div>
+      <div id="drop">Click to select the video file you already produced</div>
+      <input type="file" id="file" accept="video/mp4,video/quicktime" class="hide">
+      <div class="sub" id="fileInfo" style="margin-top:10px"></div>
+    </div></div>
+  </div>
+
+  <div class="card" id="s3">
+    <div class="step"><div class="num"><span>3</span></div><div style="flex:1">
+      <b>Caption</b>
+      <label>Caption / hashtags</label>
+      <textarea id="title">My first AutoPost video #demo</textarea>
+      <label>Cover frame (ms)</label>
+      <input type="text" id="cover" value="1000">
+    </div></div>
+  </div>
+
+  <div class="card" id="s4">
+    <div class="step"><div class="num"><span>4</span></div><div style="flex:1">
+      <b>Send to TikTok</b>
+      <div class="sub">The Content Posting API is called only after you click this button.</div>
+      <div class="row">
+        <button class="primary" id="btnSend">Send to TikTok inbox (draft)</button>
+      </div>
+      <div class="bar"><i id="prog"></i></div>
+      <pre id="log" class="hide"></pre>
+    </div></div>
+  </div>
+
+  <div class="foot">
+    By publishing you agree to our <a href="./terms.html">Terms of Service</a> and <a href="./privacy.html">Privacy Policy</a>.
+  </div>
+</div>
+
+<script>
+const API = "https://beyond-tail-publicly-makes.trycloudflare.com";
+const REDIRECT = location.origin + location.pathname.replace(/index\.html$/, "") + "callback.html";
+const SCOPES = "user.info.basic,video.upload";
+const CLIENT_KEY = "sbawc1faijig9lsy51";
+
+const $ = (id) => document.getElementById(id);
+let fileId = null;
+function log(t) { const el = $("log"); el.classList.remove("hide"); el.textContent += t + "\n"; el.scrollTop = el.scrollHeight; }
+
+function b64url(bytes) {
+  return btoa(String.fromCharCode(...new Uint8Array(bytes))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+async function makePKCE() {
+  const raw = new Uint8Array(48);
+  crypto.getRandomValues(raw);
+  const verifier = b64url(raw);
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier));
+  return { verifier, challenge: b64url(digest) };
+}
+
+async function refresh() {
+  try {
+    const s = await (await fetch(API + "/api/state")).json();
+    if (s.connected) {
+      $("conn").textContent = "Connected as @" + (s.username || s.open_id);
+      $("btnDisc").classList.remove("hide");
+      $("btnConnect").textContent = "Reconnect";
+      $("s1").classList.add("done");
+    } else {
+      $("conn").textContent = "Not connected";
+    }
+  } catch (e) { $("conn").textContent = "Backend unreachable: " + e.message; }
+}
+
+$("btnConnect").onclick = async () => {
+  const { verifier, challenge } = await makePKCE();
+  localStorage.setItem("tt_verifier", verifier);
+  const u = new URL("https://www.tiktok.com/v2/auth/authorize/");
+  u.searchParams.set("client_key", CLIENT_KEY);
+  u.searchParams.set("scope", SCOPES);
+  u.searchParams.set("response_type", "code");
+  u.searchParams.set("redirect_uri", REDIRECT);
+  u.searchParams.set("state", Math.random().toString(36).slice(2));
+  u.searchParams.set("code_challenge", challenge);
+  u.searchParams.set("code_challenge_method", "S256");
+  location.href = u.toString();
+};
+
+$("btnDisc").onclick = async () => {
+  await fetch(API + "/api/logout", { method: "POST" });
+  location.reload();
+};
+
+$("drop").onclick = () => $("file").click();
+$("file").onchange = async (e) => {
+  const f = e.target.files[0]; if (!f) return;
+  $("fileInfo").textContent = "Uploading " + f.name + " (" + (f.size / 1048576).toFixed(1) + " MB)…";
+  const r = await fetch(API + "/api/file?name=" + encodeURIComponent(f.name), { method: "POST", body: f });
+  const j = await r.json();
+  fileId = j.file_id;
+  $("fileInfo").textContent = "Ready: " + f.name + " (" + (f.size / 1048576).toFixed(1) + " MB)";
+  $("s2").classList.add("done");
+};
+
+$("btnSend").onclick = async () => {
+  if (!fileId) return alert("Choose a video first");
+  $("btnSend").disabled = true;
+  log("Calling /v2/post/publish/inbox/video/init/ …");
+  const r = await fetch(API + "/api/inbox", {
+    method: "POST", headers: { "content-type": "application/json" },
+    body: JSON.stringify({ file_id: fileId })
+  });
+  const j = await r.json();
+  if (j.error) { log("ERROR " + JSON.stringify(j.error)); $("btnSend").disabled = false; return; }
+  log("publish_id = " + j.publish_id);
+  $("s3").classList.add("done");
+  let p = 10;
+  const timer = setInterval(async () => {
+    const s = await (await fetch(API + "/api/status?id=" + encodeURIComponent(j.publish_id))).json();
+    p = Math.min(97, p + 6);
+    $("prog").style.width = p + "%";
+    log("status: " + (s.status || "PENDING") + (s.fail_reason ? " / " + s.fail_reason : ""));
+    if (["SEND_TO_USER_INBOX", "PUBLISH_COMPLETE", "FAILED"].includes(s.status)) {
+      clearInterval(timer);
+      $("prog").style.width = "100%";
+      $("s4").classList.add("done");
+      $("btnSend").disabled = false;
+    }
+  }, 3000);
+};
+
+refresh();
+</script>
+</body>
+</html>

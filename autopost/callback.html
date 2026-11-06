@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Connecting to TikTok…</title>
+<style>
+  body{margin:0;background:#0b0b0f;color:#f4f4f7;font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC",sans-serif;display:grid;place-items:center;min-height:100vh}
+  .box{text-align:center;max-width:460px;padding:24px}
+  .spin{width:34px;height:34px;border-radius:50%;border:3px solid #26262f;border-top-color:#fe2c55;margin:0 auto 18px;animation:s 1s linear infinite}
+  @keyframes s{to{transform:rotate(360deg)}}
+  .err{color:#ff6b81;font-size:13px;word-break:break-all;text-align:left;background:#15151c;border:1px solid #26262f;border-radius:10px;padding:12px;margin-top:14px}
+  a{color:#25f4ee}
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="spin" id="spin"></div>
+  <h2 id="h">Finishing authorization…</h2>
+  <p id="p" style="color:#9a9aab">Exchanging the authorization code for an access token.</p>
+  <div class="err hide" id="err"></div>
+  <p style="margin-top:20px"><a href="./">Back to AutoPost Studio</a></p>
+</div>
+<script>
+const API = "https://beyond-tail-publicly-makes.trycloudflare.com";
+(async () => {
+  const q = new URLSearchParams(location.search);
+  const code = q.get("code");
+  const err = q.get("error") || q.get("error_type");
+  if (err) {
+    document.getElementById("h").textContent = "Authorization failed";
+    document.getElementById("p").textContent = "TikTok returned an error.";
+    const e = document.getElementById("err");
+    e.classList.remove("hide");
+    e.textContent = q.toString();
+    document.getElementById("spin").style.display = "none";
+    return;
+  }
+  if (!code) {
+    document.getElementById("h").textContent = "No authorization code";
+    document.getElementById("spin").style.display = "none";
+    return;
+  }
+  const verifier = localStorage.getItem("tt_verifier") || "";
+  try {
+    const r = await fetch(API + "/api/exchange", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ code, verifier })
+    });
+    const j = await r.json();
+    if (j.ok) {
+      document.getElementById("h").textContent = "Connected ✓";
+      document.getElementById("p").textContent = "open_id: " + j.open_id + " · scope: " + j.scope;
+      setTimeout(() => { location.replace("./"); }, 1200);
+    } else {
+      document.getElementById("h").textContent = "Token exchange failed";
+      document.getElementById("spin").style.display = "none";
+      const e = document.getElementById("err");
+      e.classList.remove("hide");
+      e.textContent = JSON.stringify(j, null, 2);
+    }
+  } catch (e) {
+    document.getElementById("h").textContent = "Backend unreachable";
+    document.getElementById("spin").style.display = "none";
+    const el = document.getElementById("err");
+    el.classList.remove("hide");
+    el.textContent = String(e);
+  }
+})();
+</script>
+</body>
+</html>
