@@ -69,9 +69,9 @@
 <header><div class="wrap nav">
   <a class="brand" href="./"><img src="./icon-192.png" alt="AutoPost Studio"><span>AutoPost Studio</span></a>
   <nav class="navlinks">
-    <a href="#features" data-k="nav1">功能</a>
-    <a href="#how" data-k="nav2">怎么用</a>
-    <a href="#faq" data-k="nav3">常见问题</a>
+    <a href="javascript:void(0)" data-goto="features" data-k="nav1">功能</a>
+    <a href="javascript:void(0)" data-goto="how" data-k="nav2">怎么用</a>
+    <a href="javascript:void(0)" data-goto="faq" data-k="nav3">常见问题</a>
   </nav>
   <div class="navright">
     <div class="lang"><button id="bz">中文</button><button id="be">EN</button></div>
@@ -89,7 +89,7 @@
        它会通过 TikTok 官方 Content Posting API 把文件上传到你的账号，无需先传到手机。</p>
     <div class="cta">
       <a class="btn primary" href="./app.html">打开工作台 →</a>
-      <a class="btn ghost" href="#how">看看怎么用</a>
+      <a class="btn ghost" href="javascript:void(0)" data-goto="how">看看怎么用</a>
     </div>
     <div class="badges">
       <span class="badge">官方 API 接入</span>
@@ -99,7 +99,7 @@
     </div>
   </div>
 
-  <section id="features"><div class="wrap">
+  <section data-sec="features"><div class="wrap">
     <h2>它解决什么问题</h2>
     <p class="lead">运营多个账号、每天要发多条视频的时候，最烦的不是剪片子，是「把片子弄到手机上再一步步上传」。</p>
     <div class="grid g3">
@@ -112,7 +112,7 @@
     </div>
   </div></section>
 
-  <section id="how"><div class="wrap">
+  <section data-sec="how"><div class="wrap">
     <h2>三步发一条</h2>
     <p class="lead">整个过程在你自己的浏览器里完成，视频文件不经过任何第三方存储。</p>
     <div class="grid g3" style="margin-bottom:26px">
@@ -127,7 +127,7 @@
     <p class="lead" style="margin:26px 0 0">想马上试？<a href="./app.html">打开工作台 →</a></p>
   </div></section>
 
-  <section id="faq"><div class="wrap">
+  <section data-sec="faq"><div class="wrap">
     <h2>常见问题</h2>
     <p class="lead">还没说清的，看这里。</p>
 
@@ -165,7 +165,7 @@
        no transferring to your phone first.</p>
     <div class="cta">
       <a class="btn primary" href="./app.html">Open the studio →</a>
-      <a class="btn ghost" href="#how">See how it works</a>
+      <a class="btn ghost" href="javascript:void(0)" data-goto="how">See how it works</a>
     </div>
     <div class="badges">
       <span class="badge">Official API</span>
@@ -175,7 +175,7 @@
     </div>
   </div>
 
-  <section id="features"><div class="wrap">
+  <section data-sec="features"><div class="wrap">
     <h2>What it solves</h2>
     <p class="lead">When you run several accounts, the slow part is not editing — it is getting the file onto a phone and uploading it step by step.</p>
     <div class="grid g3">
@@ -188,7 +188,7 @@
     </div>
   </div></section>
 
-  <section id="how"><div class="wrap">
+  <section data-sec="how"><div class="wrap">
     <h2>Three steps</h2>
     <p class="lead">Everything happens in your own browser. Video files are never stored by a third party.</p>
     <div class="grid g3" style="margin-bottom:26px">
@@ -203,7 +203,7 @@
     <p class="lead" style="margin:26px 0 0">Ready? <a href="./app.html">Open the studio →</a></p>
   </div></section>
 
-  <section id="faq"><div class="wrap">
+  <section data-sec="faq"><div class="wrap">
     <h2>FAQ</h2>
     <p class="lead">The things people ask first.</p>
 
@@ -260,6 +260,15 @@ function show(l) {
   });
   document.documentElement.lang = l === "zh" ? "zh-CN" : "en";
 }
+document.addEventListener("click", (e) => {
+  const a = e.target.closest("[data-goto]");
+  if (!a) return;
+  e.preventDefault();
+  const lang = document.getElementById("zh").classList.contains("hide") ? "en" : "zh";
+  const root = document.getElementById(lang);
+  const sec = root && root.querySelector('[data-sec="' + a.getAttribute("data-goto") + '"]');
+  if (sec) sec.scrollIntoView({ behavior: "smooth", block: "start" });
+});
 document.getElementById("bz").onclick = () => show("zh");
 document.getElementById("be").onclick = () => show("en");
 show(zh ? "zh" : "en");
