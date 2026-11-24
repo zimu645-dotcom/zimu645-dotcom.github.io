@@ -32,7 +32,16 @@ document.getElementById("h").textContent = TXT.h;
 document.getElementById("p").textContent = TXT.p;
 document.getElementById("back").textContent = TXT.back;
 
-const API = location.hostname.endsWith("github.io") ? "https://beyond-tail-publicly-makes.trycloudflare.com" : "";
+let API = location.hostname.endsWith('github.io') ? 'https://mines-bios-almost-scripting.trycloudflare.com' : '';
+const API_READY = (async () => {
+  if (!location.hostname.endsWith('github.io')) { API = ''; return API; }
+  try {
+    const r = await fetch('./api.json?t=' + Date.now(), { cache: 'no-store' });
+    const j = await r.json();
+    if (j && j.api) API = j.api.replace(/\/+$/, '');
+  } catch (e) {}
+  return API;
+})();
 (async () => {
   const q = new URLSearchParams(location.search);
   const code = q.get("code");
@@ -45,6 +54,7 @@ const API = location.hostname.endsWith("github.io") ? "https://beyond-tail-publi
     return;
   }
   if (!code) { H.textContent = TXT.noCode; document.getElementById("spin").style.display = "none"; return; }
+  await API_READY;
   const verifier = localStorage.getItem("tt_verifier") || "";
   try {
     const r = await fetch(API + "/api/exchange", {
